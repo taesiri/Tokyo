@@ -12,7 +12,6 @@ namespace Assets.Scripts.Arena
 
         public void Start()
         {
-
             Location.PointLocation = GUILocationHelper.Point.Center;
             Location.UpdateLocation();
 
@@ -27,6 +26,31 @@ namespace Assets.Scripts.Arena
             GUI.matrix = _guiMatrix;
             _menuSelectedIndex = GUI.Toolbar(new Rect(0, 0, 300, 75), _menuSelectedIndex, _menuStrings);
             GUI.matrix = Matrix4x4.identity;
+        }
+
+        public void Update()
+        {
+            HandleTouchEvents();
+            HandleMouseEvents();
+        }
+
+        private void HandleMouseEvents()
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hitInfo;
+                Physics.Raycast(ray, out hitInfo, 100);
+                if (hitInfo.collider)
+                {
+                    var gCell = hitInfo.collider.GetComponent<GridCellObject>();
+                    gCell.GotHit();
+                }
+            }
+        }
+
+        private void HandleTouchEvents()
+        {
         }
     }
 }

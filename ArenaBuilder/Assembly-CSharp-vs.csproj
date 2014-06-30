@@ -48,6 +48,8 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Arena\Brain.cs" />
      <Compile Include="Assets\Scripts\Arena\Grid.cs" />
+     <Compile Include="Assets\Scripts\Arena\GridCell.cs" />
+     <Compile Include="Assets\Scripts\Arena\GridCellObject.cs" />
      <Compile Include="Assets\Scripts\Helpers\GUILocationHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
