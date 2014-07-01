@@ -4,6 +4,7 @@
     {
         PlayMode,
         EditMode,
+        EraserMode,
         CreationMode
     }
 }

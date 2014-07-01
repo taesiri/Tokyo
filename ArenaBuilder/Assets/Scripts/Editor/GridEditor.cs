@@ -58,7 +58,8 @@ namespace Assets.Scripts.Editor
                             var pos = new Vector3(i*_scaleFactor + _offX, j*_scaleFactor + _offY, _zIndex);
                             GameObject tileElement = (GameObject) Instantiate(currentObject.GridTileObject, pos, Quaternion.identity);
                             tileElement.name = String.Format("{0}-{1}", i, j);
-                            tileElement.transform.parent = currentObject.transform; 
+                            tileElement.transform.parent = currentObject.transform;
+                            tileElement.layer = 8;
                         }
                        
                     }

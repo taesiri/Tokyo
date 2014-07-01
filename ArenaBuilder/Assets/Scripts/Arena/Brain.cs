@@ -6,9 +6,10 @@ namespace Assets.Scripts.Arena
 {
     public class Brain : MonoBehaviour
     {
-        private readonly string[] _menuStrings = {"Creation", "PlayMode"};
+        private readonly string[] _menuStrings = {"Creation", "Edit", "Erase", "PlayMode"};
         public BrainStates BrainState;
         public List<Deployable> DeployableList;
+        public Transform GridTransform;
         public GUILocationHelper Location = new GUILocationHelper();
         private Deployable _currentObject;
         private Matrix4x4 _guiMatrix;
@@ -18,29 +19,38 @@ namespace Assets.Scripts.Arena
 
         public void Start()
         {
-            Location.PointLocation = GUILocationHelper.Point.Center;
+            Location.PointLocation = GUILocationHelper.Point.BottomLeft;
             Location.UpdateLocation();
+
 
             Vector2 ratio = Location.GuiOffset;
             _guiMatrix = Matrix4x4.identity;
             _guiMatrix.SetTRS(new Vector3(1, 1, 1), Quaternion.identity, new Vector3(ratio.x, ratio.y, 1));
 
             BrainState = BrainStates.EditMode;
+
+            if (!GridTransform)
+            {
+                Debug.LogWarning("Grid Transform is Missing!");
+                GridTransform = GameObject.FindWithTag("Grid").transform;
+            }
         }
 
         public void OnGUI()
         {
+            GUI.Label(new Rect(0, 0, 100, 50), BrainState.ToString());
+            _menuSelectedIndex = GUI.Toolbar(new Rect(0, Location.Offset.y - 100, 300, 75), _menuSelectedIndex,
+                _menuStrings);
+
             switch (BrainState)
             {
                 case BrainStates.PlayMode:
                     break;
+                case BrainStates.EraserMode:
+                    break;
                 case BrainStates.EditMode:
                 case BrainStates.CreationMode:
                     GUI.matrix = _guiMatrix;
-
-
-                    GUI.Label(new Rect(0, 0, 100, 50), BrainState.ToString());
-                    _menuSelectedIndex = GUI.Toolbar(new Rect(0, 210, 300, 75), _menuSelectedIndex, _menuStrings);
 
 
                     for (int i = 0; i < DeployableList.Count; i++)
@@ -60,8 +70,28 @@ namespace Assets.Scripts.Arena
                         }
                     }
 
-
                     GUI.matrix = Matrix4x4.identity;
+                    break;
+            }
+
+            UpdateBrainState();
+        }
+
+        private void UpdateBrainState()
+        {
+            switch (_menuSelectedIndex)
+            {
+                case 0:
+                    BrainState = BrainStates.CreationMode;
+                    break;
+                case 1:
+                    BrainState = BrainStates.EditMode;
+                    break;
+                case 2:
+                    BrainState = BrainStates.EraserMode;
+                    break;
+                case 3:
+                    BrainState = BrainStates.PlayMode;
                     break;
             }
         }
@@ -72,7 +102,11 @@ namespace Assets.Scripts.Arena
             {
                 case BrainStates.PlayMode:
                     break;
+                case BrainStates.EraserMode:
+                    EraserUpdate();
+                    break;
                 case BrainStates.EditMode:
+                    break;
                 case BrainStates.CreationMode:
                     HandleMouseEvents();
                     //#if UNITY_IPHONE || UNITY_ANDROID
@@ -85,13 +119,47 @@ namespace Assets.Scripts.Arena
         }
 
 
+        private void EraserUpdate()
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                isDown = true;
+              
+            }
+            if (isDown)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hitInfo;
+                Physics.Raycast(ray, out hitInfo, 100, 1 << 8);
+                if (hitInfo.collider)
+                {
+                    var gCell = hitInfo.collider.GetComponent<GridCellObject>();
+                    if (gCell)
+                    {
+                        if (!gCell.IsEmpty)
+                        {
+                            Destroy(gCell.InCellObject.gameObject);
+                            gCell.IsEmpty = true;
+                        }
+                    }
+                }
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                isDown = false;
+            }
+        }
+
         private void HandleMouseEvents()
         {
             if (_currentObject)
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    isDown = true;
+                    if (_currentObject.DeploymentMethod == DeploymentMethod.Brush)
+                    {
+                        isDown = true;
+                    }
                     Debug.Log("Mouse Down - HandleMouseEvents");
                 }
                 if (Input.GetMouseButtonUp(0))
@@ -99,15 +167,17 @@ namespace Assets.Scripts.Arena
                     isDown = false;
                     Debug.Log("Mouse Up - HandleMouseEvents");
 
-
-                    // 
-
+                    // Not the Base Way for handling new Cell Instatiation!
                     if (_currentObject && _lastVisitedTile)
                     {
                         if (_currentObject.DeploymentMethod == DeploymentMethod.Drag)
                         {
-                            Instantiate(_currentObject, _lastVisitedTile.gameObject.transform.position,
-                                Quaternion.identity);
+                            var newCell =
+                                (Deployable) Instantiate(_currentObject, _lastVisitedTile.gameObject.transform.position,
+                                    Quaternion.identity);
+                            newCell.transform.parent = GridTransform.parent;
+
+                            _lastVisitedTile.InCellObject = newCell.transform;
                             _lastVisitedTile.IsEmpty = false;
                         }
                     }
@@ -151,7 +221,6 @@ namespace Assets.Scripts.Arena
             }
         }
 
-
         private void DragCheck()
         {
             Debug.Log("Dragging");
@@ -170,8 +239,16 @@ namespace Assets.Scripts.Arena
                             switch (_currentObject.DeploymentMethod)
                             {
                                 case DeploymentMethod.Brush:
-                                    Instantiate(_currentObject, gCell.gameObject.transform.position, Quaternion.identity);
+                                    var newCell =
+                                        (Deployable)
+                                            Instantiate(_currentObject, gCell.gameObject.transform.position,
+                                                Quaternion.identity);
+
+                                    newCell.transform.parent = GridTransform.transform;
+
                                     gCell.IsEmpty = false;
+                                    gCell.InCellObject = newCell.transform;
+
                                     break;
                                 case DeploymentMethod.Drag:
                                     // Wait for End of Drag!
