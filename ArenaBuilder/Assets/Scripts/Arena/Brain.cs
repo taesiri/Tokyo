@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Assets.Scripts.Helpers;
 using UnityEngine;
 
@@ -11,11 +12,14 @@ namespace Assets.Scripts.Arena
         public List<Deployable> DeployableList;
         public Transform GridTransform;
         public GUILocationHelper Location = new GUILocationHelper();
+        private bool _allowToMove;
         private Deployable _currentObject;
         private Matrix4x4 _guiMatrix;
+        private bool _isDown;
         private GridCellObject _lastVisitedTile;
         private int _menuSelectedIndex;
-        private bool isDown;
+        private GridCellObject _originCellObject;
+        private Deployable _selectedObject;
 
         public void Start()
         {
@@ -49,6 +53,12 @@ namespace Assets.Scripts.Arena
                 case BrainStates.EraserMode:
                     break;
                 case BrainStates.EditMode:
+                    if (_selectedObject)
+                    {
+                        GUI.Label(new Rect(0, 50, 400, 50),
+                            String.Format("Selected Object: {0}", _selectedObject.name));
+                    }
+                    break;
                 case BrainStates.CreationMode:
                     GUI.matrix = _guiMatrix;
 
@@ -59,7 +69,7 @@ namespace Assets.Scripts.Arena
                         {
                             if (DeployableList[i].DeploymentMethod == DeploymentMethod.Drag)
                             {
-                                isDown = true;
+                                _isDown = true;
                             }
                             else if (DeployableList[i].DeploymentMethod == DeploymentMethod.Brush)
                             {
@@ -106,6 +116,7 @@ namespace Assets.Scripts.Arena
                     EraserUpdate();
                     break;
                 case BrainStates.EditMode:
+                    EditUpdate();
                     break;
                 case BrainStates.CreationMode:
                     CreationUpdate();
@@ -123,9 +134,9 @@ namespace Assets.Scripts.Arena
         {
             if (Input.GetMouseButtonDown(0))
             {
-                isDown = true;
+                _isDown = true;
             }
-            if (isDown)
+            if (_isDown)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hitInfo;
@@ -145,7 +156,7 @@ namespace Assets.Scripts.Arena
             }
             if (Input.GetMouseButtonUp(0))
             {
-                isDown = false;
+                _isDown = false;
             }
         }
 
@@ -157,13 +168,13 @@ namespace Assets.Scripts.Arena
                 {
                     if (_currentObject.DeploymentMethod == DeploymentMethod.Brush)
                     {
-                        isDown = true;
+                        _isDown = true;
                     }
                     Debug.Log("Mouse Down - CreationUpdate");
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
-                    isDown = false;
+                    _isDown = false;
                     Debug.Log("Mouse Up - CreationUpdate");
 
                     // Not the Base Way for handling new Cell Instatiation!
@@ -175,6 +186,8 @@ namespace Assets.Scripts.Arena
                                 (Deployable) Instantiate(_currentObject, _lastVisitedTile.gameObject.transform.position,
                                     Quaternion.identity);
                             newCell.transform.parent = GridTransform;
+                            newCell.gameObject.layer = 9;
+                            newCell.ParentGridCellObject = _lastVisitedTile;
 
                             _lastVisitedTile.InCellObject = newCell.transform;
                             _lastVisitedTile.IsEmpty = false;
@@ -183,42 +196,120 @@ namespace Assets.Scripts.Arena
                     _lastVisitedTile = null;
                 }
 
-                if (isDown)
+                if (_isDown)
                 {
                     DragCheck();
                 }
             }
         }
 
-        private void HandleTouchEvents()
+
+        private void EditUpdate()
         {
-            if (Input.touchCount == 1)
+            if (Input.GetMouseButtonDown(0))
             {
-                switch (Input.touches[0].phase)
+                _isDown = true;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hitInfo;
+                Physics.Raycast(ray, out hitInfo, 100, 1 << 9);
+                if (hitInfo.collider)
                 {
-                    case TouchPhase.Began:
-                        break;
-                    case TouchPhase.Moved:
-                        if (isDown)
-                        {
-                            DragCheck();
-                        }
-                        break;
-                    case TouchPhase.Stationary:
-                        break;
-                    case TouchPhase.Canceled:
-                        isDown = false;
-                        break;
-                    case TouchPhase.Ended:
-                        isDown = false;
-                        break;
+                    _selectedObject = hitInfo.collider.gameObject.GetComponent<Deployable>();
+                    _originCellObject = _selectedObject.ParentGridCellObject;
+                    _allowToMove = true;
+
+                }
+                else
+                {
+                    _allowToMove = false;
                 }
             }
-            else if (Input.touchCount == 0)
+
+            if (_allowToMove)
             {
-                isDown = false;
+                Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                pos.z = _selectedObject.transform.position.z;
+                _selectedObject.transform.position = pos;
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                if (_allowToMove)
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit hitInfo;
+                    Physics.Raycast(ray, out hitInfo, 100, 1 << 8);
+                    if (hitInfo.collider)
+                    {
+                        var gCell = hitInfo.collider.GetComponent<GridCellObject>();
+                        if (gCell)
+                        {
+                            if (gCell.IsEmpty)
+                            {
+                                gCell.IsEmpty = false;
+                                gCell.InCellObject = _selectedObject.transform;
+                                _selectedObject.transform.position = gCell.transform.position;
+                                _selectedObject.ParentGridCellObject = gCell;
+
+                                _originCellObject.IsEmpty = true;
+                                _originCellObject.InCellObject = null;
+                                _originCellObject = null;
+                            }
+                            else
+                            {
+                                ResetSelectedObjectPosition();
+                            }
+                        }
+                        else
+                        {
+                            ResetSelectedObjectPosition();
+                        }
+                    }
+                    else
+                    {
+                        ResetSelectedObjectPosition();
+                    }
+                }
+
+                _isDown = false;
+                _allowToMove = false;
             }
         }
+
+        private void ResetSelectedObjectPosition()
+        {
+            _selectedObject.transform.position = _originCellObject.transform.position;
+        }
+
+        //private void HandleTouchEvents()
+        //{
+        //    if (Input.touchCount == 1)
+        //    {
+        //        switch (Input.touches[0].phase)
+        //        {
+        //            case TouchPhase.Began:
+        //                break;
+        //            case TouchPhase.Moved:
+        //                if (_isDown)
+        //                {
+        //                    DragCheck();
+        //                }
+        //                break;
+        //            case TouchPhase.Stationary:
+        //                break;
+        //            case TouchPhase.Canceled:
+        //                _isDown = false;
+        //                break;
+        //            case TouchPhase.Ended:
+        //                _isDown = false;
+        //                break;
+        //        }
+        //    }
+        //    else if (Input.touchCount == 0)
+        //    {
+        //        _isDown = false;
+        //    }
+        //}
 
         private void DragCheck()
         {
@@ -244,9 +335,12 @@ namespace Assets.Scripts.Arena
                                                 Quaternion.identity);
 
                                     newCell.transform.parent = GridTransform;
+                                    newCell.gameObject.layer = 9;
+                                    newCell.ParentGridCellObject = gCell;
 
                                     gCell.IsEmpty = false;
                                     gCell.InCellObject = newCell.transform;
+
 
                                     break;
                                 case DeploymentMethod.Drag:
