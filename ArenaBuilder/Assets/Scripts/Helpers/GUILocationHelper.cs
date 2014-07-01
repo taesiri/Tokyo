@@ -7,7 +7,7 @@ namespace Assets.Scripts.Helpers
         public enum Point
         {
             TopLeft,
-            TopRigjt,
+            TopRight,
             BottomLeft,
             BottomRight,
             Center
@@ -26,7 +26,7 @@ namespace Assets.Scripts.Helpers
                 case Point.TopLeft:
                     Offset = new Vector2(0, 0);
                     break;
-                case Point.TopRigjt:
+                case Point.TopRight:
                     Offset = new Vector2(OriginalWidth, 0);
                     break;
                 case Point.BottomLeft:
