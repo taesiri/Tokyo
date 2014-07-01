@@ -108,11 +108,11 @@ namespace Assets.Scripts.Arena
                 case BrainStates.EditMode:
                     break;
                 case BrainStates.CreationMode:
-                    HandleMouseEvents();
+                    CreationUpdate();
                     //#if UNITY_IPHONE || UNITY_ANDROID
                     //            HandleTouchEvents();
                     //#elif !UNITY_FLASH
-                    //              HandleMouseEvents();
+                    //              CreationUpdate();
                     //#endif
                     break;
             }
@@ -124,7 +124,6 @@ namespace Assets.Scripts.Arena
             if (Input.GetMouseButtonDown(0))
             {
                 isDown = true;
-              
             }
             if (isDown)
             {
@@ -150,7 +149,7 @@ namespace Assets.Scripts.Arena
             }
         }
 
-        private void HandleMouseEvents()
+        private void CreationUpdate()
         {
             if (_currentObject)
             {
@@ -160,12 +159,12 @@ namespace Assets.Scripts.Arena
                     {
                         isDown = true;
                     }
-                    Debug.Log("Mouse Down - HandleMouseEvents");
+                    Debug.Log("Mouse Down - CreationUpdate");
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
                     isDown = false;
-                    Debug.Log("Mouse Up - HandleMouseEvents");
+                    Debug.Log("Mouse Up - CreationUpdate");
 
                     // Not the Base Way for handling new Cell Instatiation!
                     if (_currentObject && _lastVisitedTile)
@@ -175,7 +174,7 @@ namespace Assets.Scripts.Arena
                             var newCell =
                                 (Deployable) Instantiate(_currentObject, _lastVisitedTile.gameObject.transform.position,
                                     Quaternion.identity);
-                            newCell.transform.parent = GridTransform.parent;
+                            newCell.transform.parent = GridTransform;
 
                             _lastVisitedTile.InCellObject = newCell.transform;
                             _lastVisitedTile.IsEmpty = false;
@@ -244,7 +243,7 @@ namespace Assets.Scripts.Arena
                                             Instantiate(_currentObject, gCell.gameObject.transform.position,
                                                 Quaternion.identity);
 
-                                    newCell.transform.parent = GridTransform.transform;
+                                    newCell.transform.parent = GridTransform;
 
                                     gCell.IsEmpty = false;
                                     gCell.InCellObject = newCell.transform;
