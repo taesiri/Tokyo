@@ -16,9 +16,9 @@ namespace Assets.Scripts.Arena
         private Deployable _currentObject;
         private Matrix4x4 _guiMatrix;
         private bool _isDown;
-        private GridCellObject _lastVisitedTile;
+        private GridCell _lastVisitedTile;
         private int _menuSelectedIndex;
-        private GridCellObject _originCellObject;
+        private GridCell _originCell;
         private Deployable _selectedObject;
 
         public void Start()
@@ -143,7 +143,7 @@ namespace Assets.Scripts.Arena
                 Physics.Raycast(ray, out hitInfo, 100, 1 << 8);
                 if (hitInfo.collider)
                 {
-                    var gCell = hitInfo.collider.GetComponent<GridCellObject>();
+                    var gCell = hitInfo.collider.GetComponent<GridCell>();
                     if (gCell)
                     {
                         if (!gCell.IsEmpty)
@@ -187,7 +187,7 @@ namespace Assets.Scripts.Arena
                                     Quaternion.identity);
                             newCell.transform.parent = GridTransform;
                             newCell.gameObject.layer = 9;
-                            newCell.ParentGridCellObject = _lastVisitedTile;
+                            newCell.ParentGridCell = _lastVisitedTile;
 
                             _lastVisitedTile.InCellObject = newCell.transform;
                             _lastVisitedTile.IsEmpty = false;
@@ -215,9 +215,8 @@ namespace Assets.Scripts.Arena
                 if (hitInfo.collider)
                 {
                     _selectedObject = hitInfo.collider.gameObject.GetComponent<Deployable>();
-                    _originCellObject = _selectedObject.ParentGridCellObject;
+                    _originCell = _selectedObject.ParentGridCell;
                     _allowToMove = true;
-
                 }
                 else
                 {
@@ -241,7 +240,7 @@ namespace Assets.Scripts.Arena
                     Physics.Raycast(ray, out hitInfo, 100, 1 << 8);
                     if (hitInfo.collider)
                     {
-                        var gCell = hitInfo.collider.GetComponent<GridCellObject>();
+                        var gCell = hitInfo.collider.GetComponent<GridCell>();
                         if (gCell)
                         {
                             if (gCell.IsEmpty)
@@ -249,11 +248,11 @@ namespace Assets.Scripts.Arena
                                 gCell.IsEmpty = false;
                                 gCell.InCellObject = _selectedObject.transform;
                                 _selectedObject.transform.position = gCell.transform.position;
-                                _selectedObject.ParentGridCellObject = gCell;
+                                _selectedObject.ParentGridCell = gCell;
 
-                                _originCellObject.IsEmpty = true;
-                                _originCellObject.InCellObject = null;
-                                _originCellObject = null;
+                                _originCell.IsEmpty = true;
+                                _originCell.InCellObject = null;
+                                _originCell = null;
                             }
                             else
                             {
@@ -278,7 +277,7 @@ namespace Assets.Scripts.Arena
 
         private void ResetSelectedObjectPosition()
         {
-            _selectedObject.transform.position = _originCellObject.transform.position;
+            _selectedObject.transform.position = _originCell.transform.position;
         }
 
         //private void HandleTouchEvents()
@@ -319,7 +318,7 @@ namespace Assets.Scripts.Arena
             Physics.Raycast(ray, out hitInfo, 100);
             if (hitInfo.collider)
             {
-                var gCell = hitInfo.collider.GetComponent<GridCellObject>();
+                var gCell = hitInfo.collider.GetComponent<GridCell>();
                 if (gCell)
                 {
                     if (gCell.IsEmpty)
@@ -336,7 +335,7 @@ namespace Assets.Scripts.Arena
 
                                     newCell.transform.parent = GridTransform;
                                     newCell.gameObject.layer = 9;
-                                    newCell.ParentGridCellObject = gCell;
+                                    newCell.ParentGridCell = gCell;
 
                                     gCell.IsEmpty = false;
                                     gCell.InCellObject = newCell.transform;

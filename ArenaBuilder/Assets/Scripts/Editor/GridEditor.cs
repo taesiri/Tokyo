@@ -9,7 +9,7 @@ namespace Assets.Scripts.Editor
     public class GridEditor : UnityEditor.Editor
     {
         private int _offX = -4, _offY = -4;
-        private float _scaleFactor = 1.01f;
+        private float _scaleFactor = 1.03f;
         private int _sizeX = 8, _sizeY = 8;
         private int _zIndex = 5;
 
@@ -45,23 +45,27 @@ namespace Assets.Scripts.Editor
         private void GenerateGrid()
         {
             var currentObject = (Grid) target;
+
+            currentObject.Cells = new GridCell[_sizeX, _sizeY];
+
             if (_sizeX != 0 && _sizeY != 0)
             {
                 for (int i = 0; i < _sizeX; i++)
                 {
                     for (int j = 0; j < _sizeY; j++)
                     {
-
                         if (currentObject.GridTileObject)
                         {
-
                             var pos = new Vector3(i*_scaleFactor + _offX, j*_scaleFactor + _offY, _zIndex);
-                            GameObject tileElement = (GameObject) Instantiate(currentObject.GridTileObject, pos, Quaternion.identity);
+                            var tileElement =
+                                (GameObject) Instantiate(currentObject.GridTileObject, pos, Quaternion.identity);
                             tileElement.name = String.Format("{0}-{1}", i, j);
                             tileElement.transform.parent = currentObject.transform;
                             tileElement.layer = 8;
+
+
+                            currentObject.Cells[i, j] = tileElement.GetComponent<GridCell>();
                         }
-                       
                     }
                 }
             }
