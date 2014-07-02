@@ -254,21 +254,27 @@ namespace Assets.Scripts.Arena
                         {
                             if (gCell.IsEmpty)
                             {
-                                gCell.InCellObject = _selectedObject;
-                                // *FIXED* Caution : Cell in the vicinity of gCell dosent store reference to TILE ELEMENT[_selectedObject]
-                                Vector3 pos = gCell.gameObject.transform.position;
+                                if (GameGrid.IsPlaceable(_selectedObject.TileMap, gCell))
+                                {
+                                    gCell.InCellObject = _selectedObject;
+                                    Vector3 pos = gCell.gameObject.transform.position;
 
-                                pos.x += _currentObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
-                                         GameGrid.CellWidth/2f;
-                                pos.y -= _currentObject.TileMap.TileSize.Y/2f*GameGrid.CellWidth -
-                                         GameGrid.CellWidth/2f;
-                                _selectedObject.transform.position = pos;
-                                _selectedObject.ParentGridCell = gCell;
+                                    pos.x += _selectedObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
+                                             GameGrid.CellWidth/2f;
+                                    pos.y -= _selectedObject.TileMap.TileSize.Y/2f*GameGrid.CellWidth -
+                                             GameGrid.CellWidth/2f;
+                                    _selectedObject.transform.position = pos;
+                                    _selectedObject.ParentGridCell = gCell;
 
 
-                                GameGrid.UpdateTilesState(_selectedObject, _originCell, CellState.Empty);
-                                GameGrid.UpdateTilesState(_selectedObject, gCell, CellState.Full);
-                                _originCell = null;
+                                    GameGrid.UpdateTilesState(_selectedObject, _originCell, CellState.Empty);
+                                    GameGrid.UpdateTilesState(_selectedObject, gCell, CellState.Full);
+                                    _originCell = null;
+                                }
+                                else
+                                {
+                                    ResetSelectedObjectPosition();
+                                }
                             }
                             else
                             {
@@ -295,9 +301,9 @@ namespace Assets.Scripts.Arena
         {
             Vector3 pos = _originCell.transform.position;
 
-            pos.x += _currentObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
+            pos.x += _selectedObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
                      GameGrid.CellWidth/2f;
-            pos.y -= _currentObject.TileMap.TileSize.Y/2f*GameGrid.CellWidth -
+            pos.y -= _selectedObject.TileMap.TileSize.Y/2f*GameGrid.CellWidth -
                      GameGrid.CellWidth/2f;
 
             _selectedObject.transform.position = pos;

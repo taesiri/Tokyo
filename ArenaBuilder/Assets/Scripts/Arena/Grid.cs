@@ -12,6 +12,7 @@ namespace Assets.Scripts.Arena
 
         public bool IsPlaceable(TileMap tile, GridCell originCell)
         {
+            // TODO: Ignore Self!
             for (int i = 0; i < tile.TileSize.X; i++)
             {
                 for (int j = 0; j < tile.TileSize.Y; j++)
