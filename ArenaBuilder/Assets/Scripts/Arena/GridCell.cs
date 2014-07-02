@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Helpers;
+using UnityEngine;
 
 namespace Assets.Scripts.Arena
 {
     public class GridCell : MonoBehaviour
     {
+        [SerializeField] public IntVector2 GridPostion;
         public Transform InCellObject;
         public bool IsEmpty = true;
 

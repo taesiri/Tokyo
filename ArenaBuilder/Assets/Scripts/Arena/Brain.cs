@@ -10,6 +10,7 @@ namespace Assets.Scripts.Arena
         private readonly string[] _menuStrings = {"Creation", "Edit", "Erase", "PlayMode"};
         public BrainStates BrainState;
         public List<Deployable> DeployableList;
+        public Grid GameGrid;
         public Transform GridTransform;
         public GUILocationHelper Location = new GUILocationHelper();
         private bool _allowToMove;
@@ -37,6 +38,11 @@ namespace Assets.Scripts.Arena
             {
                 Debug.LogWarning("Grid Transform is Missing!");
                 GridTransform = GameObject.FindWithTag("Grid").transform;
+            }
+            if (!GameGrid)
+            {
+                Debug.LogWarning("Game Grid is Missing!");
+                GameGrid = GameObject.FindWithTag("Grid").GetComponent<Grid>();
             }
         }
 
@@ -245,13 +251,20 @@ namespace Assets.Scripts.Arena
                         {
                             if (gCell.IsEmpty)
                             {
-                                gCell.IsEmpty = false;
+                                GameGrid.UpdateTilesState(_selectedObject.TileMap, gCell, CellState.Full);
                                 gCell.InCellObject = _selectedObject.transform;
-                                _selectedObject.transform.position = gCell.transform.position;
+                                // Caution : Cell in the vicinity of gCell dosent store reference to TILE ELEMENT[_selectedObject]
+                                Vector3 pos = gCell.gameObject.transform.position;
+
+                                pos.x += _currentObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
+                                         GameGrid.CellWidth/2f;
+                                pos.y -= _currentObject.TileMap.TileSize.Y/2f*GameGrid.CellWidth -
+                                         GameGrid.CellWidth/2f;
+                                _selectedObject.transform.position = pos;
                                 _selectedObject.ParentGridCell = gCell;
 
-                                _originCell.IsEmpty = true;
-                                _originCell.InCellObject = null;
+
+                                GameGrid.UpdateTilesState(_selectedObject.TileMap, _originCell, CellState.Empty);
                                 _originCell = null;
                             }
                             else
@@ -277,7 +290,14 @@ namespace Assets.Scripts.Arena
 
         private void ResetSelectedObjectPosition()
         {
-            _selectedObject.transform.position = _originCell.transform.position;
+            Vector3 pos = _originCell.transform.position;
+
+            pos.x += _currentObject.TileMap.TileSize.X / 2f * GameGrid.CellWidth -
+                     GameGrid.CellWidth / 2f;
+            pos.y -= _currentObject.TileMap.TileSize.Y / 2f * GameGrid.CellWidth -
+                     GameGrid.CellWidth / 2f;
+
+            _selectedObject.transform.position = pos;
         }
 
         //private void HandleTouchEvents()
@@ -323,29 +343,37 @@ namespace Assets.Scripts.Arena
                 {
                     if (gCell.IsEmpty)
                     {
-                        if (_currentObject)
+                        if (GameGrid.IsPlaceable(_currentObject.TileMap, gCell))
                         {
-                            switch (_currentObject.DeploymentMethod)
+                            if (_currentObject)
                             {
-                                case DeploymentMethod.Brush:
-                                    var newCell =
-                                        (Deployable)
-                                            Instantiate(_currentObject, gCell.gameObject.transform.position,
-                                                Quaternion.identity);
+                                switch (_currentObject.DeploymentMethod)
+                                {
+                                    case DeploymentMethod.Brush:
 
-                                    newCell.transform.parent = GridTransform;
-                                    newCell.gameObject.layer = 9;
-                                    newCell.ParentGridCell = gCell;
+                                        Vector3 pos = gCell.gameObject.transform.position;
 
-                                    gCell.IsEmpty = false;
-                                    gCell.InCellObject = newCell.transform;
+                                        pos.x += _currentObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
+                                                 GameGrid.CellWidth/2f;
+                                        pos.y -= _currentObject.TileMap.TileSize.Y/2f*GameGrid.CellWidth -
+                                                 GameGrid.CellWidth/2f;
 
+                                        var newCell =
+                                            (Deployable)
+                                                Instantiate(_currentObject, pos, Quaternion.identity);
 
-                                    break;
-                                case DeploymentMethod.Drag:
-                                    // Wait for End of Drag!
-                                    _lastVisitedTile = gCell;
-                                    break;
+                                        newCell.transform.parent = GridTransform;
+                                        newCell.gameObject.layer = 9;
+                                        newCell.ParentGridCell = gCell;
+                                        GameGrid.UpdateTilesState(_currentObject.TileMap, gCell, CellState.Full);
+                                        gCell.InCellObject = newCell.transform;
+
+                                        break;
+                                    case DeploymentMethod.Drag:
+                                        // Wait for End of Drag!
+                                        _lastVisitedTile = gCell;
+                                        break;
+                                }
                             }
                         }
                     }
