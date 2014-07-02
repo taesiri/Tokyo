@@ -6,7 +6,7 @@ namespace Assets.Scripts.Arena
     public class GridCell : MonoBehaviour
     {
         [SerializeField] public IntVector2 GridPostion;
-        public Transform InCellObject;
+        public Deployable InCellObject;
         public bool IsEmpty = true;
 
         public void GotHit()

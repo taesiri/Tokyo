@@ -154,8 +154,15 @@ namespace Assets.Scripts.Arena
                     {
                         if (!gCell.IsEmpty)
                         {
-                            Destroy(gCell.InCellObject.gameObject);
-                            gCell.IsEmpty = true;
+                            // Worst Way possible to handle deletion!
+                            if (gCell.InCellObject)
+                            {
+                                //Hold reference to CellObject to Destroy it after clearing the Grid
+                                Deployable toDelete = gCell.InCellObject;
+                                GameGrid.UpdateTilesState(gCell.InCellObject, gCell.InCellObject.ParentGridCell,
+                                    CellState.Empty);
+                                Destroy(toDelete.gameObject);
+                            }
                         }
                     }
                 }
@@ -176,14 +183,10 @@ namespace Assets.Scripts.Arena
                     {
                         _isDown = true;
                     }
-                    Debug.Log("Mouse Down - CreationUpdate");
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
                     _isDown = false;
-                    Debug.Log("Mouse Up - CreationUpdate");
-
-                    // Not the Base Way for handling new Cell Instatiation!
                     if (_currentObject && _lastVisitedTile)
                     {
                         if (_currentObject.DeploymentMethod == DeploymentMethod.Drag)
@@ -195,7 +198,7 @@ namespace Assets.Scripts.Arena
                             newCell.gameObject.layer = 9;
                             newCell.ParentGridCell = _lastVisitedTile;
 
-                            _lastVisitedTile.InCellObject = newCell.transform;
+                            _lastVisitedTile.InCellObject = newCell;
                             _lastVisitedTile.IsEmpty = false;
                         }
                     }
@@ -251,9 +254,8 @@ namespace Assets.Scripts.Arena
                         {
                             if (gCell.IsEmpty)
                             {
-                                GameGrid.UpdateTilesState(_selectedObject.TileMap, gCell, CellState.Full);
-                                gCell.InCellObject = _selectedObject.transform;
-                                // Caution : Cell in the vicinity of gCell dosent store reference to TILE ELEMENT[_selectedObject]
+                                gCell.InCellObject = _selectedObject;
+                                // *FIXED* Caution : Cell in the vicinity of gCell dosent store reference to TILE ELEMENT[_selectedObject]
                                 Vector3 pos = gCell.gameObject.transform.position;
 
                                 pos.x += _currentObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
@@ -264,7 +266,8 @@ namespace Assets.Scripts.Arena
                                 _selectedObject.ParentGridCell = gCell;
 
 
-                                GameGrid.UpdateTilesState(_selectedObject.TileMap, _originCell, CellState.Empty);
+                                GameGrid.UpdateTilesState(_selectedObject, _originCell, CellState.Empty);
+                                GameGrid.UpdateTilesState(_selectedObject, gCell, CellState.Full);
                                 _originCell = null;
                             }
                             else
@@ -292,10 +295,10 @@ namespace Assets.Scripts.Arena
         {
             Vector3 pos = _originCell.transform.position;
 
-            pos.x += _currentObject.TileMap.TileSize.X / 2f * GameGrid.CellWidth -
-                     GameGrid.CellWidth / 2f;
-            pos.y -= _currentObject.TileMap.TileSize.Y / 2f * GameGrid.CellWidth -
-                     GameGrid.CellWidth / 2f;
+            pos.x += _currentObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
+                     GameGrid.CellWidth/2f;
+            pos.y -= _currentObject.TileMap.TileSize.Y/2f*GameGrid.CellWidth -
+                     GameGrid.CellWidth/2f;
 
             _selectedObject.transform.position = pos;
         }
@@ -332,7 +335,6 @@ namespace Assets.Scripts.Arena
 
         private void DragCheck()
         {
-            Debug.Log("Dragging");
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hitInfo;
             Physics.Raycast(ray, out hitInfo, 100);
@@ -350,7 +352,6 @@ namespace Assets.Scripts.Arena
                                 switch (_currentObject.DeploymentMethod)
                                 {
                                     case DeploymentMethod.Brush:
-
                                         Vector3 pos = gCell.gameObject.transform.position;
 
                                         pos.x += _currentObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
@@ -365,8 +366,8 @@ namespace Assets.Scripts.Arena
                                         newCell.transform.parent = GridTransform;
                                         newCell.gameObject.layer = 9;
                                         newCell.ParentGridCell = gCell;
-                                        GameGrid.UpdateTilesState(_currentObject.TileMap, gCell, CellState.Full);
-                                        gCell.InCellObject = newCell.transform;
+                                        GameGrid.UpdateTilesState(newCell, gCell, CellState.Full);
+                                        gCell.InCellObject = newCell;
 
                                         break;
                                     case DeploymentMethod.Drag:

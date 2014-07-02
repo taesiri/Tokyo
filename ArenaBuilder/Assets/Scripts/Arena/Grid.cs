@@ -12,9 +12,6 @@ namespace Assets.Scripts.Arena
 
         public bool IsPlaceable(TileMap tile, GridCell originCell)
         {
-            Debug.Log(string.Format("TileMap Size:{0}", tile.TileSize));
-            Debug.Log(string.Format("Original Cell: {0}", originCell.GridPostion));
-
             for (int i = 0; i < tile.TileSize.X; i++)
             {
                 for (int j = 0; j < tile.TileSize.Y; j++)
@@ -27,8 +24,6 @@ namespace Assets.Scripts.Arena
                         }
                     else
                     {
-                        Debug.Log(i + originCell.GridPostion.X);
-                        Debug.Log(j + originCell.GridPostion.Y);
                         return false;
                     }
                 }
@@ -37,23 +32,26 @@ namespace Assets.Scripts.Arena
             return true;
         }
 
-        public void UpdateTilesState(TileMap tile, GridCell originCell, CellState newState)
+        public void UpdateTilesState(Deployable deployableObject, GridCell originCell, CellState newState)
         {
-            for (int i = 0; i < tile.TileSize.X; i++)
+            for (int i = 0; i < deployableObject.TileMap.TileSize.X; i++)
             {
-                for (int j = 0; j < tile.TileSize.Y; j++)
+                for (int j = 0; j < deployableObject.TileMap.TileSize.Y; j++)
                 {
                     if (i + originCell.GridPostion.X < Row && j + originCell.GridPostion.Y < Column)
                     {
-                        Cells[GetIndex(i + originCell.GridPostion.X, j + originCell.GridPostion.Y)].IsEmpty =
-                            newState.ToBool();
+                        int index = GetIndex(i + originCell.GridPostion.X, j + originCell.GridPostion.Y);
 
+                        Cells[index].IsEmpty = newState.ToBool();
 
-                        //if (newState == CellState.Empty)
-                        //{
-                        //    Cells[GetIndex(i + originCell.GridPostion.X, j + originCell.GridPostion.Y)].InCellObject =
-                        //        null;
-                        //}
+                        if (newState == CellState.Empty)
+                        {
+                            Cells[index].InCellObject = null;
+                        }
+                        else if (newState == CellState.Full)
+                        {
+                            Cells[index].InCellObject = deployableObject;
+                        }
                     }
                 }
             }
