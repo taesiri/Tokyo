@@ -55,6 +55,7 @@
      <Compile Include="Assets\Scripts\Arena\DeploymentMethod.cs" />
      <Compile Include="Assets\Scripts\Arena\Grid.cs" />
      <Compile Include="Assets\Scripts\Arena\GridCell.cs" />
+     <Compile Include="Assets\Scripts\Arena\IgnoreMask.cs" />
      <Compile Include="Assets\Scripts\Arena\NotSoCuteCube.cs" />
      <Compile Include="Assets\Scripts\Arena\TileMap.cs" />
      <Compile Include="Assets\Scripts\Helpers\GUILocationHelper.cs" />

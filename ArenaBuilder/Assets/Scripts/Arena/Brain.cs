@@ -226,6 +226,9 @@ namespace Assets.Scripts.Arena
                     _selectedObject = hitInfo.collider.gameObject.GetComponent<Deployable>();
                     _originCell = _selectedObject.ParentGridCell;
                     _allowToMove = true;
+
+                    // I am Cheating! :-)
+                    GameGrid.UpdateTilesState(_selectedObject, _originCell, CellState.Empty);
                 }
                 else
                 {
@@ -307,6 +310,9 @@ namespace Assets.Scripts.Arena
                      GameGrid.CellWidth/2f;
 
             _selectedObject.transform.position = pos;
+
+
+            GameGrid.UpdateTilesState(_selectedObject, _selectedObject.ParentGridCell, CellState.Full);
         }
 
         //private void HandleTouchEvents()
