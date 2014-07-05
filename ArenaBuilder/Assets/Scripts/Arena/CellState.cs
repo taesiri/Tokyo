@@ -14,11 +14,9 @@
             {
                 case CellState.Full:
                     return false;
-                    break;
                 case CellState.Empty:
                     return true;
             }
-
             return false;
         }
     }

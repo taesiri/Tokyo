@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Arena\BigCube.cs" />
+     <Compile Include="Assets\Scripts\Arena\BiggerCube.cs" />
      <Compile Include="Assets\Scripts\Arena\Brain.cs" />
      <Compile Include="Assets\Scripts\Arena\BrainStates.cs" />
      <Compile Include="Assets\Scripts\Arena\CellState.cs" />

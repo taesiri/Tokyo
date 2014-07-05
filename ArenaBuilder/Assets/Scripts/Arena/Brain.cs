@@ -137,43 +137,6 @@ namespace Assets.Scripts.Arena
         }
 
 
-        private void EraserUpdate()
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                _isDown = true;
-            }
-            if (_isDown)
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hitInfo;
-                Physics.Raycast(ray, out hitInfo, 100, 1 << 8);
-                if (hitInfo.collider)
-                {
-                    var gCell = hitInfo.collider.GetComponent<GridCell>();
-                    if (gCell)
-                    {
-                        if (!gCell.IsEmpty)
-                        {
-                            // Worst Way possible to handle deletion!
-                            if (gCell.InCellObject)
-                            {
-                                //Hold reference to CellObject to Destroy it after clearing the Grid
-                                Deployable toDelete = gCell.InCellObject;
-                                GameGrid.UpdateTilesState(gCell.InCellObject, gCell.InCellObject.ParentGridCell,
-                                    CellState.Empty);
-                                Destroy(toDelete.gameObject);
-                            }
-                        }
-                    }
-                }
-            }
-            if (Input.GetMouseButtonUp(0))
-            {
-                _isDown = false;
-            }
-        }
-
         private void CreationUpdate()
         {
             if (_currentObject)
@@ -185,6 +148,8 @@ namespace Assets.Scripts.Arena
                         _isDown = true;
                     }
                 }
+                // this code doesn't check tile status (empty or full)ness
+                // WTF
                 if (Input.GetMouseButtonUp(0))
                 {
                     _isDown = false;
@@ -213,6 +178,58 @@ namespace Assets.Scripts.Arena
             }
         }
 
+        private void DragCheck()
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+            Physics.Raycast(ray, out hitInfo, 100);
+            if (hitInfo.collider)
+            {
+                var gCell = hitInfo.collider.GetComponent<GridCell>();
+                if (gCell)
+                {
+                    if (gCell.IsEmpty)
+                    {
+                        if (GameGrid.IsPlaceableWithOffset(_currentObject.TileMap, gCell))
+                        {
+                            if (_currentObject)
+                            {
+                                switch (_currentObject.DeploymentMethod)
+                                {
+                                    case DeploymentMethod.Brush:
+                                        Vector3 pos = gCell.gameObject.transform.position;
+
+                                        Vector2 wOffset =
+                                            _currentObject.TileMap.GetWorldTransformOffset(GameGrid.CellWidth);
+
+
+                                        // TODO: Need an update for supporting TileOffset
+                                        pos.x += wOffset.x;
+                                        pos.y += wOffset.y;
+
+                                        var newCell =
+                                            (Deployable)
+                                                Instantiate(_currentObject, pos, Quaternion.identity);
+
+                                        newCell.transform.parent = GridTransform;
+                                        newCell.gameObject.layer = 9;
+                                        newCell.ParentGridCell = gCell;
+                                        GameGrid.UpdateTilesStateWithOffset(newCell, gCell, CellState.Full);
+                                        gCell.InCellObject = newCell;
+
+                                        break;
+                                    case DeploymentMethod.Drag:
+                                        // Wait for End of Drag!
+                                        _lastVisitedTile = gCell;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         private void EditUpdate()
         {
@@ -229,9 +246,10 @@ namespace Assets.Scripts.Arena
                     _allowToMove = true;
 
                     // I am Cheating! :-)
-                    GameGrid.UpdateTilesState(_selectedObject, _originCell, CellState.Empty);
+                    GameGrid.UpdateTilesStateWithOffset(_selectedObject, _originCell, CellState.Empty);
 
-                    _selectedObjectDeltaPosition = _selectedObject.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    _selectedObjectDeltaPosition = _selectedObject.transform.position -
+                                                   Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     //Ignoreing Z Index
                     _selectedObjectDeltaPosition.z = 0;
 
@@ -264,21 +282,25 @@ namespace Assets.Scripts.Arena
                         {
                             if (gCell.IsEmpty)
                             {
-                                if (GameGrid.IsPlaceable(_selectedObject.TileMap, gCell))
+                                if (GameGrid.IsPlaceableWithOffset(_selectedObject.TileMap, gCell))
                                 {
                                     gCell.InCellObject = _selectedObject;
                                     Vector3 pos = gCell.gameObject.transform.position;
 
-                                    pos.x += _selectedObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
-                                             GameGrid.CellWidth/2f;
-                                    pos.y -= _selectedObject.TileMap.TileSize.Y/2f*GameGrid.CellWidth -
-                                             GameGrid.CellWidth/2f;
+                                    
+                                    Vector2 wOffset =
+                                        _selectedObject.TileMap.GetWorldTransformOffset(GameGrid.CellWidth);
+
+                                    // TODO: Need an update for supporting TileOffset
+                                    pos.x += wOffset.x;
+                                    pos.y += wOffset.y;
+
                                     _selectedObject.transform.position = pos;
                                     _selectedObject.ParentGridCell = gCell;
 
 
-                                    GameGrid.UpdateTilesState(_selectedObject, _originCell, CellState.Empty);
-                                    GameGrid.UpdateTilesState(_selectedObject, gCell, CellState.Full);
+                                    GameGrid.UpdateTilesStateWithOffset(_selectedObject, _originCell, CellState.Empty);
+                                    GameGrid.UpdateTilesStateWithOffset(_selectedObject, gCell, CellState.Full);
                                     _originCell = null;
                                 }
                                 else
@@ -319,85 +341,44 @@ namespace Assets.Scripts.Arena
             _selectedObject.transform.position = pos;
 
 
-            GameGrid.UpdateTilesState(_selectedObject, _selectedObject.ParentGridCell, CellState.Full);
+            GameGrid.UpdateTilesStateWithOffset(_selectedObject, _selectedObject.ParentGridCell, CellState.Full);
         }
 
-        //private void HandleTouchEvents()
-        //{
-        //    if (Input.touchCount == 1)
-        //    {
-        //        switch (Input.touches[0].phase)
-        //        {
-        //            case TouchPhase.Began:
-        //                break;
-        //            case TouchPhase.Moved:
-        //                if (_isDown)
-        //                {
-        //                    DragCheck();
-        //                }
-        //                break;
-        //            case TouchPhase.Stationary:
-        //                break;
-        //            case TouchPhase.Canceled:
-        //                _isDown = false;
-        //                break;
-        //            case TouchPhase.Ended:
-        //                _isDown = false;
-        //                break;
-        //        }
-        //    }
-        //    else if (Input.touchCount == 0)
-        //    {
-        //        _isDown = false;
-        //    }
-        //}
 
-        private void DragCheck()
+        private void EraserUpdate()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hitInfo;
-            Physics.Raycast(ray, out hitInfo, 100);
-            if (hitInfo.collider)
+            if (Input.GetMouseButtonDown(0))
             {
-                var gCell = hitInfo.collider.GetComponent<GridCell>();
-                if (gCell)
+                _isDown = true;
+            }
+            if (_isDown)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hitInfo;
+                Physics.Raycast(ray, out hitInfo, 100, 1 << 8);
+                if (hitInfo.collider)
                 {
-                    if (gCell.IsEmpty)
+                    var gCell = hitInfo.collider.GetComponent<GridCell>();
+                    if (gCell)
                     {
-                        if (GameGrid.IsPlaceable(_currentObject.TileMap, gCell))
+                        if (!gCell.IsEmpty)
                         {
-                            if (_currentObject)
+                            // Worst Way possible to handle deletion!
+                            if (gCell.InCellObject)
                             {
-                                switch (_currentObject.DeploymentMethod)
-                                {
-                                    case DeploymentMethod.Brush:
-                                        Vector3 pos = gCell.gameObject.transform.position;
-
-                                        pos.x += _currentObject.TileMap.TileSize.X/2f*GameGrid.CellWidth -
-                                                 GameGrid.CellWidth/2f;
-                                        pos.y -= _currentObject.TileMap.TileSize.Y/2f*GameGrid.CellWidth -
-                                                 GameGrid.CellWidth/2f;
-
-                                        var newCell =
-                                            (Deployable)
-                                                Instantiate(_currentObject, pos, Quaternion.identity);
-
-                                        newCell.transform.parent = GridTransform;
-                                        newCell.gameObject.layer = 9;
-                                        newCell.ParentGridCell = gCell;
-                                        GameGrid.UpdateTilesState(newCell, gCell, CellState.Full);
-                                        gCell.InCellObject = newCell;
-
-                                        break;
-                                    case DeploymentMethod.Drag:
-                                        // Wait for End of Drag!
-                                        _lastVisitedTile = gCell;
-                                        break;
-                                }
+                                //Hold reference to CellObject to Destroy it after clearing the Grid
+                                Deployable toDelete = gCell.InCellObject;
+                                GameGrid.UpdateTilesStateWithOffset(gCell.InCellObject, gCell.InCellObject.ParentGridCell,
+                                    CellState.Empty);
+                                Destroy(toDelete.gameObject);
                             }
                         }
                     }
                 }
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                _isDown = false;
             }
         }
     }
