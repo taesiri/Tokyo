@@ -21,6 +21,7 @@ namespace Assets.Scripts.Arena
         private int _menuSelectedIndex;
         private GridCell _originCell;
         private Deployable _selectedObject;
+        private Vector3 _selectedObjectDeltaPosition;
 
         public void Start()
         {
@@ -229,6 +230,12 @@ namespace Assets.Scripts.Arena
 
                     // I am Cheating! :-)
                     GameGrid.UpdateTilesState(_selectedObject, _originCell, CellState.Empty);
+
+                    _selectedObjectDeltaPosition = _selectedObject.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    //Ignoreing Z Index
+                    _selectedObjectDeltaPosition.z = 0;
+
+                    Debug.Log(_selectedObjectDeltaPosition);
                 }
                 else
                 {
@@ -240,7 +247,7 @@ namespace Assets.Scripts.Arena
             {
                 Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 pos.z = _selectedObject.transform.position.z;
-                _selectedObject.transform.position = pos;
+                _selectedObject.transform.position = pos + _selectedObjectDeltaPosition;
             }
 
             if (Input.GetMouseButtonUp(0))
