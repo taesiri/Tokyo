@@ -22,6 +22,13 @@ namespace Assets.Scripts.Helpers
             Y = y;
         }
 
+        public IntVector2(float x, float y)
+        {
+            X = (int) x;
+            Y = (int) y;
+        }
+
+
         public override string ToString()
         {
             return String.Format("X: {0}, Y: {1}", X, Y);
