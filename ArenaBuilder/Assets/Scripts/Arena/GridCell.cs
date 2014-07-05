@@ -11,7 +11,7 @@ namespace Assets.Scripts.Arena
 
         public void GotHit()
         {
-            Debug.Log(string.Format("Object hitted at {0}", gameObject.name));
+            
         }
     }
 }

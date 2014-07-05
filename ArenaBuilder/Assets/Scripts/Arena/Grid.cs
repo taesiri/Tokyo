@@ -9,7 +9,7 @@ namespace Assets.Scripts.Arena
         public int Column;
         public GameObject GridTileObject;
         public int Row;
-
+        [HideInInspector] public bool DrawGizmo = true;
 
         public bool IsPlaceableWithOffset(TileMap tile, GridCell originCell)
         {

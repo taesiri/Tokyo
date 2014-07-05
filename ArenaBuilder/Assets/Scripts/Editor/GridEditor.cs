@@ -10,6 +10,7 @@ namespace Assets.Scripts.Editor
     public class GridEditor : UnityEditor.Editor
     {
         private int _cellSize = 1;
+
         private int _offX = -4, _offY = -4;
         private float _scaleFactor = 1.03f;
         private int _sizeX = 8, _sizeY = 8;
@@ -17,6 +18,8 @@ namespace Assets.Scripts.Editor
 
         public override void OnInspectorGUI()
         {
+            var currentObject = (Grid) target;
+
             base.OnInspectorGUI();
             GUILayout.Label("Grid Helper");
 
@@ -31,6 +34,9 @@ namespace Assets.Scripts.Editor
             _zIndex = EditorGUILayout.IntField("Z Index", _zIndex);
             _scaleFactor = EditorGUILayout.FloatField("Scale Factor", _scaleFactor);
 
+            currentObject.DrawGizmo = EditorGUILayout.ToggleLeft("Cell Status - Under revision, Use with caution!",
+                currentObject.DrawGizmo);
+
 
             if (GUILayout.Button("Generate Grid"))
             {
@@ -43,6 +49,7 @@ namespace Assets.Scripts.Editor
             if (GUI.changed)
             {
             }
+            SceneView.RepaintAll();
         }
 
 
@@ -82,6 +89,11 @@ namespace Assets.Scripts.Editor
         private void ClearGrid()
         {
             var currentObject = (Grid) target;
+
+
+            bool oldVal = currentObject.DrawGizmo;
+            currentObject.DrawGizmo = false;
+
             var killList = new Transform[currentObject.transform.childCount];
             for (int i = 0; i < killList.Length; i++)
             {
@@ -92,19 +104,26 @@ namespace Assets.Scripts.Editor
             {
                 DestroyImmediate(killList[i].gameObject);
             }
+
+            currentObject.DrawGizmo = oldVal;
         }
 
 
         public void OnSceneGUI()
         {
             var currentObject = (Grid) target;
-            foreach (GridCell gridCell in currentObject.Cells)
+            if (currentObject.DrawGizmo)
             {
-                Handles.color = gridCell.IsEmpty ? Color.green : Color.red;
-                Handles.CubeCap(0,
-                    gridCell.transform.position,
-                    gridCell.transform.rotation,
-                    0.9f);
+                foreach (GridCell gridCell in currentObject.Cells)
+                {
+                    Handles.color = gridCell.IsEmpty ? Color.green : Color.red;
+                    Handles.CubeCap(0,
+                        gridCell.transform.position,
+                        gridCell.transform.rotation,
+                        0.9f);
+                }
+
+                SceneView.RepaintAll();
             }
         }
     }

@@ -81,8 +81,6 @@ namespace Assets.Scripts.Arena
                             else if (DeployableList[i].DeploymentMethod == DeploymentMethod.Brush)
                             {
                             }
-
-                            Debug.Log(string.Format("Clicked On {0}", DeployableList[i].GetDisplayName()));
                             _currentObject = DeployableList[i];
                         }
                     }
