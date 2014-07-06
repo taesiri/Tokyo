@@ -46,7 +46,9 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Arena\AdvanceBrain.cs" />
      <Compile Include="Assets\Scripts\Arena\AdvanceGrid.cs" />
+     <Compile Include="Assets\Scripts\Arena\AdvanceGridCell.cs" />
      <Compile Include="Assets\Scripts\Arena\BigCube.cs" />
      <Compile Include="Assets\Scripts\Arena\BiggerCube.cs" />
      <Compile Include="Assets\Scripts\Arena\Brain.cs" />

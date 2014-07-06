@@ -38,6 +38,13 @@ namespace Assets.Scripts.Editor
             if (grid.PlaneTransform)
             {
                 grid.PlaneTransform.localScale = new Vector3(grid.Columns/10f, 1, grid.Rows/10f);
+                grid.Cells = new AdvanceGridCell[grid.Rows*grid.Columns];
+
+                for (int i = 0; i < grid.Rows*grid.Columns; i++)
+                {
+                    grid.Cells[i] = new AdvanceGridCell {IsEmpty = true};
+                }
+                grid.PlaneTransform.gameObject.layer = 10;
             }
         }
 
@@ -47,10 +54,16 @@ namespace Assets.Scripts.Editor
             plane.name = "Grid Plane";
             plane.transform.Rotate(Vector3.right, 270);
             plane.transform.parent = grid.transform;
+            plane.layer = 10;
             grid.PlaneTransform = plane.transform;
 
             grid.Rows = 8;
             grid.Columns = 8;
+
+
+            var childernTransform = new GameObject("ChildTransform");
+            childernTransform.transform.parent = grid.transform;
+            grid.ChildTransform = childernTransform.transform;
 
             UpdateGridSize(grid);
         }
