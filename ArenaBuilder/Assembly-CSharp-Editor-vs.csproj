@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Editor\AdvanceGridEditor.cs" />
      <Compile Include="Assets\Scripts\Editor\AutoLevelBuilder.cs" />
      <Compile Include="Assets\Scripts\Editor\GridCellEditor.cs" />
      <Compile Include="Assets\Scripts\Editor\GridEditor.cs" />
