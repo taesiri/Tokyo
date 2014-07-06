@@ -181,45 +181,10 @@ namespace Assets.Scripts.Arena
                     GameGrid.DeployIfPossible(ray, _objectToDeploy);
                     break;
                 case DeploymentMethod.Drag:
+                    // Wait for End of Drag!
+                    //_lastVisitedTile = gCell;
                     break;
             }
-
-
-            //if (GameGrid.IsPlaceable(ray, _objectToDeploy))
-            //{
-            //    if (_objectToDeploy)
-            //    {
-            //        switch (_objectToDeploy.DeploymentMethod)
-            //        {
-            //            case DeploymentMethod.Brush:
-            //                Vector3 pos = gCell.gameObject.transform.position;
-
-            //                Vector2 wOffset =
-            //                    _objectToDeploy.TileMap.GetWorldTransformOffset(GameGrid.CellWidth);
-
-
-            //                // TODO: Need an update for supporting TileOffset
-            //                pos.x += wOffset.x;
-            //                pos.y += wOffset.y;
-
-            //                var newCell =
-            //                    (Deployable)
-            //                        Instantiate(_objectToDeploy, pos, Quaternion.identity);
-
-            //                newCell.transform.parent = GameGrid.transform;
-            //                newCell.gameObject.layer = 9;
-            //                newCell.ParentGridCell = gCell;
-            //                GameGrid.UpdateTilesStateWithOffset(newCell, gCell, CellState.Full);
-            //                gCell.InCellObject = newCell;
-
-            //                break;
-            //            case DeploymentMethod.Drag:
-            //                // Wait for End of Drag!
-            //                _lastVisitedTile = gCell;
-            //                break;
-            //        }
-            //    }
-            //}
         }
 
 
@@ -229,6 +194,41 @@ namespace Assets.Scripts.Arena
 
         private void EraserUpdate()
         {
+            if (Input.GetMouseButtonDown(0))
+            {
+                _isDown = true;
+            }
+            if (_isDown)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                GameGrid.EraseTiles(ray);
+                //RaycastHit hitInfo;
+                //Physics.Raycast(ray, out hitInfo, 100, 1 << 8);
+                //if (hitInfo.collider)
+                //{
+                //    var gCell = hitInfo.collider.GetComponent<GridCell>();
+                //    if (gCell)
+                //    {
+                //        if (!gCell.IsEmpty)
+                //        {
+                //            // Worst Way possible to handle deletion!
+                //            if (gCell.InCellObject)
+                //            {
+                //                //Hold reference to CellObject to Destroy it after clearing the Grid
+                //                Deployable toDelete = gCell.InCellObject;
+                //                GameGrid.UpdateTilesStateWithOffset(gCell.InCellObject, gCell.InCellObject.ParentGridCell,
+                //                    CellState.Empty);
+                //                Destroy(toDelete.gameObject);
+                //            }
+                //        }
+                //    }
+                //}
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                _isDown = false;
+            }
         }
 
 

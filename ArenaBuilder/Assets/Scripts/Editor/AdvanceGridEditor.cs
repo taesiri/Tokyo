@@ -21,6 +21,7 @@ namespace Assets.Scripts.Editor
             else
             {
                 grid.DrawDebugLines = EditorGUILayout.ToggleLeft("Draw Debug Lines - Under revision, Use with caution!", grid.DrawDebugLines);
+                grid.DrawDebugCellStatus = EditorGUILayout.ToggleLeft("Draw Cell Statuses - Runtime only (When grid is selected)", grid.DrawDebugCellStatus);
 
                 grid.Columns = EditorGUILayout.IntField("Columns", grid.Columns);
                 grid.Rows = EditorGUILayout.IntField("Rows", grid.Rows);
@@ -87,6 +88,7 @@ namespace Assets.Scripts.Editor
                 {
                     Handles.DrawLine(lel + new Vector3(i, 0, 0), lel + new Vector3(i, grid.Rows, 0));
                 }
+
 
                 SceneView.RepaintAll();
             }
