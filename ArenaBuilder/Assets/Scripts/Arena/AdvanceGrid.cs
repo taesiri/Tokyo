@@ -116,14 +116,33 @@ namespace Assets.Scripts.Arena
             }
         }
 
-        public bool IsPlaceable(Ray ray, Deployable deployableObject)
-        {
-            return false;
-        }
 
-        public AdvanceGridCell ScreenPositionToAdvanceGridCell(Vector3 screenPosition)
+        public bool DropAtDeployableIfPossible(Ray ray, Deployable deployableObject)
         {
-            return null;
+            RaycastHit hitInfo;
+            Physics.Raycast(ray, out hitInfo, 100, 1 << 10);
+            if (hitInfo.collider)
+            {
+                Vector3 loc = hitInfo.point - _planeBottomLeftPosition;
+                var index = new IntVector2(loc.x*Columns/_boundX, loc.y*Rows/_boundY);
+
+                if (IsPlaceableWithOffset(deployableObject.TileMap, index))
+                {
+                    Vector3 pos = IndexToWorldPosition(index);
+                    Vector2 wOffset = deployableObject.TileMap.GetWorldTransformOffset(GlobalCellWidth);
+                    pos.x += wOffset.x;
+                    pos.y += wOffset.y;
+
+                    deployableObject.transform.position = pos;
+                    deployableObject.ParentAdvanceGridCell = Cells[CalculateIndex(index)];
+                    deployableObject.GridIndex = index;
+                    
+                    UpdateTilesStateWithOffset(deployableObject, index, CellState.Full);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void DeployIfPossible(Ray ray, Deployable deployableObject)
@@ -166,9 +185,7 @@ namespace Assets.Scripts.Arena
                 if (toDeleteTile)
                 {
                     IntVector2 gIdx = toDeleteTile.GridIndex;
-
                     UpdateTilesStateWithOffset(toDeleteTile, gIdx, CellState.Empty);
-
                     Destroy(toDeleteTile.gameObject);
                 }
             }

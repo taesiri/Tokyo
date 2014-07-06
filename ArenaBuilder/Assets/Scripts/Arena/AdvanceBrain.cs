@@ -19,9 +19,11 @@ namespace Assets.Scripts.Arena
         [HideInInspector] public BrainStates BrainState;
         public List<Deployable> DeployableList;
         public AdvanceGrid GameGrid;
+        private bool _allowToMove;
         private bool _isDown;
         private Deployable _objectToDeploy;
         private Deployable _selectedDeployable;
+        private Vector3 _selectedObjectDeltaPosition;
 
         #endregion
 
@@ -190,6 +192,49 @@ namespace Assets.Scripts.Arena
 
         private void EditUpdate()
         {
+            if (Input.GetMouseButtonDown(0))
+            {
+                _isDown = true;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hitInfo;
+                Physics.Raycast(ray, out hitInfo, 100, 1 << 9);
+                if (hitInfo.collider)
+                {
+                    _selectedDeployable = hitInfo.collider.gameObject.GetComponent<Deployable>();
+
+                    _allowToMove = true;
+                    GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Empty);
+                    _selectedObjectDeltaPosition = _selectedDeployable.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    _selectedObjectDeltaPosition.z = 0;
+                }
+                else
+                {
+                    _allowToMove = false;
+                }
+            }
+
+            if (_allowToMove)
+            {
+                Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                pos.z = _selectedDeployable.transform.position.z;
+                _selectedDeployable.transform.position = pos + _selectedObjectDeltaPosition;
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                if (_allowToMove)
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                    if (!GameGrid.DropAtDeployableIfPossible(ray, _selectedDeployable))
+                    {
+                        ResetSelectedObjectPosition();
+                    }
+                }
+
+                _isDown = false;
+                _allowToMove = false;
+            }
         }
 
         private void EraserUpdate()
@@ -201,29 +246,7 @@ namespace Assets.Scripts.Arena
             if (_isDown)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
                 GameGrid.EraseTiles(ray);
-                //RaycastHit hitInfo;
-                //Physics.Raycast(ray, out hitInfo, 100, 1 << 8);
-                //if (hitInfo.collider)
-                //{
-                //    var gCell = hitInfo.collider.GetComponent<GridCell>();
-                //    if (gCell)
-                //    {
-                //        if (!gCell.IsEmpty)
-                //        {
-                //            // Worst Way possible to handle deletion!
-                //            if (gCell.InCellObject)
-                //            {
-                //                //Hold reference to CellObject to Destroy it after clearing the Grid
-                //                Deployable toDelete = gCell.InCellObject;
-                //                GameGrid.UpdateTilesStateWithOffset(gCell.InCellObject, gCell.InCellObject.ParentGridCell,
-                //                    CellState.Empty);
-                //                Destroy(toDelete.gameObject);
-                //            }
-                //        }
-                //    }
-                //}
             }
             if (Input.GetMouseButtonUp(0))
             {
@@ -234,6 +257,16 @@ namespace Assets.Scripts.Arena
 
         private void ResetSelectedObjectPosition()
         {
+            Vector3 pos = GameGrid.IndexToWorldPosition(_selectedDeployable.GridIndex);
+            Vector2 wOffset = _selectedDeployable.TileMap.GetWorldTransformOffset(GameGrid.GlobalCellWidth);
+           
+            pos.x += wOffset.x;
+            pos.y += wOffset.y;
+
+
+            _selectedDeployable.transform.position = pos;
+
+            GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Full);
         }
     }
 }
