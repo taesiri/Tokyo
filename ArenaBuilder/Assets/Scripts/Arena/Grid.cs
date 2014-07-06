@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Assets.Scripts.Arena
 {
@@ -7,9 +8,9 @@ namespace Assets.Scripts.Arena
         [HideInInspector] public int CellWidth = 1;
         [SerializeField] public GridCell[] Cells;
         public int Column;
+        [HideInInspector] public bool DrawGizmo = true;
         public GameObject GridTileObject;
         public int Row;
-        [HideInInspector] public bool DrawGizmo = true;
 
         public bool IsPlaceableWithOffset(TileMap tile, GridCell originCell)
         {
@@ -19,7 +20,7 @@ namespace Assets.Scripts.Arena
                 {
                     int posX = i + originCell.GridPostion.X - tile.TileOffset.X;
                     int posY = j + originCell.GridPostion.Y - tile.TileOffset.Y;
-                    if (posX < Row && posY < Column)
+                    if (posX < Row && 0 <= posX && posY < Column && 0 <= posY)
                         if (!Cells[GetIndex(posX, posY)].IsEmpty)
                             return false;
                         else
@@ -45,7 +46,7 @@ namespace Assets.Scripts.Arena
                     int posX = i + originCell.GridPostion.X - deployableObject.TileMap.TileOffset.X;
                     int posY = j + originCell.GridPostion.Y - deployableObject.TileMap.TileOffset.Y;
 
-                    if (posX < Row && posY < Column)
+                    if (posX < Row && 0 <= posX && posY < Column && 0 <= posY)
                     {
                         int index = GetIndex(posX, posY);
 
@@ -64,7 +65,7 @@ namespace Assets.Scripts.Arena
             }
         }
 
-
+        [Obsolete("IsPlaceable is deprecated, use IsPlaceableWithOffset instead.")]
         public bool IsPlaceable(TileMap tile, GridCell originCell)
         {
             for (int i = 0; i < tile.TileSize.X; i++)
@@ -87,6 +88,7 @@ namespace Assets.Scripts.Arena
             return true;
         }
 
+        [Obsolete("UpdateTilesState is deprecated, use UpdateTilesStateWithOffset instead.")]
         public void UpdateTilesState(Deployable deployableObject, GridCell originCell, CellState newState)
         {
             for (int i = 0; i < deployableObject.TileMap.TileSize.X; i++)
@@ -114,6 +116,8 @@ namespace Assets.Scripts.Arena
 
         public int GetIndex(int x, int y)
         {
+            if (x < 0 || y < 0)
+                return -1;
             return x + (y*Row);
         }
     }
