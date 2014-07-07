@@ -117,7 +117,7 @@ namespace Assets.Scripts.Arena
         }
 
 
-        public bool DropAtDeployableIfPossible(Ray ray, Deployable deployableObject)
+        public bool DropDeployableIfPossible(Ray ray, Deployable deployableObject)
         {
             RaycastHit hitInfo;
             Physics.Raycast(ray, out hitInfo, 100, 1 << 10);
@@ -170,6 +170,28 @@ namespace Assets.Scripts.Arena
                     UpdateTilesStateWithOffset(newCell, index, CellState.Full);
                 }
             }
+        }
+
+        public bool DeployIfPossible(IntVector2 index, Deployable deployableObject)
+        {
+            if (IsPlaceableWithOffset(deployableObject.TileMap, index))
+            {
+                Vector3 pos = IndexToWorldPosition(index);
+                Vector2 wOffset = deployableObject.TileMap.GetWorldTransformOffset(GlobalCellWidth);
+                pos.x += wOffset.x;
+                pos.y += wOffset.y;
+
+                var newCell = (Deployable) Instantiate(deployableObject, pos, Quaternion.identity);
+                newCell.transform.parent = ChildTransform;
+                newCell.gameObject.layer = 9;
+                newCell.ParentAdvanceGridCell = Cells[CalculateIndex(index)];
+                newCell.GridIndex = index;
+
+                UpdateTilesStateWithOffset(newCell, index, CellState.Full);
+                return true;
+            }
+
+            return false;
         }
 
         public void EraseTiles(Ray ray)
