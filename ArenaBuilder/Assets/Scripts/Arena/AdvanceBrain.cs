@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml;
 using Assets.Scripts.Helpers;
 using UnityEngine;
 
@@ -85,6 +86,12 @@ namespace Assets.Scripts.Arena
 
                     GUI.matrix = Matrix4x4.identity;
                     break;
+            }
+
+
+            if (GUI.Button(new Rect(400, 10, 100, 50), "SAVE"))
+            {
+                SaveDataToXML();
             }
 
             UpdateBrainState();
@@ -189,7 +196,6 @@ namespace Assets.Scripts.Arena
             }
         }
 
-
         private void EditUpdate()
         {
             if (Input.GetMouseButtonDown(0))
@@ -259,14 +265,36 @@ namespace Assets.Scripts.Arena
         {
             Vector3 pos = GameGrid.IndexToWorldPosition(_selectedDeployable.GridIndex);
             Vector2 wOffset = _selectedDeployable.TileMap.GetWorldTransformOffset(GameGrid.GlobalCellWidth);
-           
+
             pos.x += wOffset.x;
             pos.y += wOffset.y;
 
-
             _selectedDeployable.transform.position = pos;
-
             GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Full);
+        }
+
+        public void SaveDataToXML()
+        {
+            Deployable[] childs = GameGrid.GetAllChildren();
+
+            using (XmlWriter writer = XmlWriter.Create("D:\\data.xml"))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("Tiles");
+
+                foreach (Deployable child in childs)
+                {
+                    writer.WriteStartElement("Tile");
+
+                    writer.WriteElementString("Name", child.GetDisplayName());
+                    writer.WriteElementString("GridIndex", child.GridIndex.ToString());
+                   
+                    writer.WriteEndElement();
+                }
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
         }
     }
 }

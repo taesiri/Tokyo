@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 
 namespace Assets.Scripts.Helpers
@@ -7,7 +8,6 @@ namespace Assets.Scripts.Helpers
     public class IntVector2
     {
         [SerializeField] public int X;
-
         [SerializeField] public int Y;
 
         public IntVector2()
@@ -28,10 +28,22 @@ namespace Assets.Scripts.Helpers
             Y = (int) y;
         }
 
+        public IntVector2(string text)
+        {
+            string[] parts = text.Split(',');
+
+            if (parts.Length != 2)
+            {
+                throw new InvalidDataException();
+            }
+
+            X = Convert.ToInt32(parts[0]);
+            Y = Convert.ToInt32(parts[1]);
+        }
 
         public override string ToString()
         {
-            return String.Format("X: {0}, Y: {1}", X, Y);
+            return String.Format("{0},{1}", X, Y);
         }
     }
 }

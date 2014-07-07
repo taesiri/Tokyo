@@ -48,7 +48,7 @@ namespace Assets.Scripts.Arena
             Cells = new AdvanceGridCell[Rows*Columns];
             for (int i = 0; i < Rows*Columns; i++)
             {
-                Cells[i] = new AdvanceGridCell {IsEmpty = true};
+                Cells[i] = new AdvanceGridCell {IsEmpty = true, ParentGrid = this};
             }
         }
 
@@ -136,7 +136,7 @@ namespace Assets.Scripts.Arena
                     deployableObject.transform.position = pos;
                     deployableObject.ParentAdvanceGridCell = Cells[CalculateIndex(index)];
                     deployableObject.GridIndex = index;
-                    
+
                     UpdateTilesStateWithOffset(deployableObject, index, CellState.Full);
                     return true;
                 }
@@ -213,6 +213,12 @@ namespace Assets.Scripts.Arena
             return pos + offset;
         }
 
+        public IntVector2 WorldPositionToIndex(Vector3 position)
+        {
+            // NOT Implemented!
+            return new IntVector2();
+        }
+
 
         public void OnDrawGizmosSelected()
         {
@@ -234,6 +240,19 @@ namespace Assets.Scripts.Arena
                     }
                 }
             }
+        }
+
+
+        public Deployable[] GetAllChildren()
+        {
+            var result = new Deployable[ChildTransform.childCount];
+
+            for (int i = 0, n = ChildTransform.childCount; i < n; i++)
+            {
+                result[i] = ChildTransform.GetChild(i).gameObject.GetComponent<Deployable>();
+            }
+
+            return result;
         }
     }
 }
