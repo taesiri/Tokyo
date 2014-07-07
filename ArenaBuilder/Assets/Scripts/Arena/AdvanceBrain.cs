@@ -21,7 +21,9 @@ namespace Assets.Scripts.Arena
         public List<Deployable> DeployableList;
         public AdvanceGrid GameGrid;
         private bool _allowToMove;
+        private Dictionary<string, Deployable> _deployableDictionary;
         private bool _isDown;
+        private string _mapName = "SampleMap";
         private Deployable _objectToDeploy;
         private Deployable _selectedDeployable;
         private Vector3 _selectedObjectDeltaPosition;
@@ -44,6 +46,13 @@ namespace Assets.Scripts.Arena
             Vector2 ratio = _location.GuiOffset;
             _guiMatrix = Matrix4x4.identity;
             _guiMatrix.SetTRS(new Vector3(1, 1, 1), Quaternion.identity, new Vector3(ratio.x, ratio.y, 1));
+
+
+            _deployableDictionary = new Dictionary<string, Deployable>(DeployableList.Count);
+            for (int i = 0, n = DeployableList.Count; i < n; i++)
+            {
+                _deployableDictionary.Add(DeployableList[i].GetDisplayName(), DeployableList[i]);
+            }
 
             BrainState = BrainStates.CreationMode;
         }
@@ -89,9 +98,13 @@ namespace Assets.Scripts.Arena
             }
 
 
-            if (GUI.Button(new Rect(400, 10, 100, 50), "SAVE"))
+            if (GUI.Button(new Rect(400, 30, 80, 50), "SAVE"))
             {
                 SaveDataToXML();
+            }
+            if (GUI.Button(new Rect(400, 100, 80, 50), "LOAD"))
+            {
+                LoadDataFromXML();
             }
 
             UpdateBrainState();
@@ -232,7 +245,7 @@ namespace Assets.Scripts.Arena
                 {
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                    if (!GameGrid.DropAtDeployableIfPossible(ray, _selectedDeployable))
+                    if (!GameGrid.DropDeployableIfPossible(ray, _selectedDeployable))
                     {
                         ResetSelectedObjectPosition();
                     }
@@ -277,7 +290,8 @@ namespace Assets.Scripts.Arena
         {
             Deployable[] childs = GameGrid.GetAllChildren();
 
-            using (XmlWriter writer = XmlWriter.Create("D:\\data.xml"))
+
+            using (XmlWriter writer = XmlWriter.Create(Application.persistentDataPath + "/" + _mapName + ".dm"))
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("Tiles");
@@ -286,14 +300,32 @@ namespace Assets.Scripts.Arena
                 {
                     writer.WriteStartElement("Tile");
 
-                    writer.WriteElementString("Name", child.GetDisplayName());
-                    writer.WriteElementString("GridIndex", child.GridIndex.ToString());
-                   
+                    writer.WriteAttributeString("Name", child.GetDisplayName());
+                    writer.WriteAttributeString("GridIndex", child.GridIndex.ToString());
+
                     writer.WriteEndElement();
                 }
 
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
+            }
+        }
+
+        public void LoadDataFromXML()
+        {
+            var reader = new XmlDocument();
+            reader.Load(Application.persistentDataPath + "/" + _mapName + ".dm");
+
+
+            if (reader.DocumentElement != null)
+            {
+                foreach (XmlNode node in reader.DocumentElement.ChildNodes)
+                {
+                    var index = new IntVector2(node.Attributes["GridIndex"].InnerText);
+                    string objectName = node.Attributes["Name"].InnerText;
+
+                    GameGrid.DeployIfPossible(index, _deployableDictionary[objectName]);
+                }
             }
         }
     }

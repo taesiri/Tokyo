@@ -8,7 +8,7 @@
 
         public override string GetDisplayName()
         {
-            return "BIG CUBE";
+            return "BIGGER CUBE";
         }
     }
 }

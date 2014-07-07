@@ -34,7 +34,7 @@ namespace Assets.Scripts.Helpers
 
             if (parts.Length != 2)
             {
-                throw new InvalidDataException();
+                throw new Exception();
             }
 
             X = Convert.ToInt32(parts[0]);
