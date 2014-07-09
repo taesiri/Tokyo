@@ -17,6 +17,7 @@ namespace Assets.Scripts.Arena
 
         #region PlaneFields
 
+        public Transform GridLinesTransform;
         public Transform PlaneTransform;
         private float _boundX;
         private float _boundY;

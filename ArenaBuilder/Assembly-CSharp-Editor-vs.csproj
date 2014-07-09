@@ -50,6 +50,7 @@
      <Compile Include="Assets\Scripts\Editor\AutoLevelBuilder.cs" />
      <Compile Include="Assets\Scripts\Editor\GridCellEditor.cs" />
      <Compile Include="Assets\Scripts\Editor\GridEditor.cs" />
+     <None Include="Assets\Shaders\GridLines.shader" />
  <Reference Include="UnityEditor.Graphs">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>
  </Reference>

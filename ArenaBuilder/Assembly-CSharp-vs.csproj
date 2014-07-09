@@ -65,6 +65,7 @@
      <Compile Include="Assets\Scripts\Arena\TileMap.cs" />
      <Compile Include="Assets\Scripts\Helpers\GUILocationHelper.cs" />
      <Compile Include="Assets\Scripts\Helpers\IntVector2.cs" />
+     <None Include="Assets\Shaders\GridLines.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

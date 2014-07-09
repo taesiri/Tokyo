@@ -16,6 +16,7 @@ namespace Assets.Scripts.Editor
                 if (GUILayout.Button("Create Grid Plane"))
                 {
                     CreateGridPlane(grid);
+                    CreateGridLines(grid);
                 }
             }
             else
@@ -30,6 +31,15 @@ namespace Assets.Scripts.Editor
                 if (GUILayout.Button("Update Grid Size"))
                 {
                     UpdateGridSize(grid);
+                }
+
+
+                if (!grid.GridLinesTransform)
+                {
+                    if (GUILayout.Button("Create Grid Lines"))
+                    {
+                        CreateGridLines(grid);
+                    }
                 }
             }
         }
@@ -47,7 +57,12 @@ namespace Assets.Scripts.Editor
                 }
                 grid.PlaneTransform.gameObject.layer = 10;
             }
+            if (grid.GridLinesTransform)
+            {
+                grid.GridLinesTransform.localScale = new Vector3(grid.Columns/10f, 1, grid.Rows/10f);
+            }
         }
+
 
         private void CreateGridPlane(AdvanceGrid grid)
         {
@@ -67,6 +82,25 @@ namespace Assets.Scripts.Editor
             grid.ChildTransform = childernTransform.transform;
 
             UpdateGridSize(grid);
+        }
+
+        private void CreateGridLines(AdvanceGrid grid)
+        {
+            GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+
+            plane.transform.position = new Vector3(0, 0, -1);
+            plane.name = "Grid Lines";
+            plane.transform.Rotate(Vector3.right, 270);
+            plane.transform.parent = grid.transform;
+            grid.GridLinesTransform = plane.transform;
+
+            //This Solution is not working for unknown reason! 
+            var mat = Resources.Load("Materials/GridMaterial", typeof (Material)) as Material;
+            plane.renderer.material = mat;
+
+            //plane.renderer.material = grid.LineMterial;
+
+            grid.GridLinesTransform.localScale = new Vector3(grid.Columns/10f, 1, grid.Rows/10f);
         }
 
         public void OnSceneGUI()
