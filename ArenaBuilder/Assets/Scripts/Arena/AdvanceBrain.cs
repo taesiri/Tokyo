@@ -44,7 +44,7 @@ namespace Assets.Scripts.Arena
         #region PropertySystem
 
         private List<PropertyInfo> _booleanProperties;
-        private List<bool> _booleanPropertiesValues;
+        private ObservableList<bool> _booleanPropertiesValues;
         private List<PropertyInfo> _selectedObjectProperties;
 
         #endregion
@@ -99,9 +99,9 @@ namespace Assets.Scripts.Arena
                             for (int i = 0; i < _booleanProperties.Count; i++)
                             {
                                 _booleanPropertiesValues[i] = GUI.Toggle(new Rect(10, 600 + (i*45), 400, 50), _booleanPropertiesValues[i], _booleanProperties[i].Name);
-                                
+
                                 // Worst Way possbile to handle changes!
-                                _booleanProperties[i].SetValue(_selectedDeployable, _booleanPropertiesValues[i], null);
+                                //_booleanProperties[i].SetValue(_selectedDeployable, _booleanPropertiesValues[i], null);
                             }
                         }
                     }
@@ -300,7 +300,8 @@ namespace Assets.Scripts.Arena
         {
             _selectedObjectProperties = new List<PropertyInfo>();
             _booleanProperties = new List<PropertyInfo>();
-            _booleanPropertiesValues = new List<bool>();
+            _booleanPropertiesValues = new ObservableList<bool>();
+
 
             _selectedObjectProperties = _selectedDeployable.GetInGameProperties();
 
@@ -315,6 +316,12 @@ namespace Assets.Scripts.Arena
                     }
                 }
             }
+            _booleanPropertiesValues.Changed += _booleanPropertiesValues_Changed;
+        }
+
+        public void _booleanPropertiesValues_Changed(int index)
+        {
+            _booleanProperties[index].SetValue(_selectedDeployable, _booleanPropertiesValues[index], null);
         }
 
         private void EraserUpdate()

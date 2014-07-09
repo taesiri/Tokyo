@@ -62,6 +62,7 @@
      <Compile Include="Assets\Scripts\Arena\IgnoreMask.cs" />
      <Compile Include="Assets\Scripts\Arena\InGameProperty.cs" />
      <Compile Include="Assets\Scripts\Arena\NotSoCuteCube.cs" />
+     <Compile Include="Assets\Scripts\Arena\ObservableList.cs" />
      <Compile Include="Assets\Scripts\Arena\PointOnPlane.cs" />
      <Compile Include="Assets\Scripts\Arena\TileMap.cs" />
      <Compile Include="Assets\Scripts\Helpers\GUILocationHelper.cs" />
