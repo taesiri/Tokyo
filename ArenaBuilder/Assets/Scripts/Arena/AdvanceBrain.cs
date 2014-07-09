@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Xml;
 using Assets.Scripts.Helpers;
 using UnityEngine;
@@ -9,13 +10,6 @@ namespace Assets.Scripts.Arena
 {
     public class AdvanceBrain : MonoBehaviour
     {
-        #region FieldsForSceneSetup
-
-        private readonly GUILocationHelper _location = new GUILocationHelper();
-        private Matrix4x4 _guiMatrix;
-
-        #endregion
-
         #region BrainOrgans
 
         [HideInInspector] public BrainStates BrainState;
@@ -23,13 +17,13 @@ namespace Assets.Scripts.Arena
         public AdvanceGrid GameGrid;
         private bool _allowToMove;
         private Dictionary<string, Deployable> _deployableDictionary;
+        private bool _gridLinesVisibilityStatus = true;
         private bool _isDown;
         private string _mapName = "SampleMap";
         private Deployable _objectToDeploy;
         private Deployable _selectedDeployable;
         private Vector3 _selectedObjectDeltaPosition;
 
-        private bool _gridLinesVisibilityStatus = true;
         public bool ShowGridLines
         {
             get { return _gridLinesVisibilityStatus; }
@@ -40,8 +34,18 @@ namespace Assets.Scripts.Arena
 
         #region GUIHelpers
 
+        private readonly GUILocationHelper _location = new GUILocationHelper();
         private readonly string[] _menuStrings = {"Create", "Edit", "Erase", "Play!"};
+        private Matrix4x4 _guiMatrix;
         private int _menuSelectedIndex;
+
+        #endregion
+
+        #region PropertySystem
+
+        private List<PropertyInfo> _booleanProperties;
+        private List<bool> _booleanPropertiesValues;
+        private List<PropertyInfo> _selectedObjectProperties;
 
         #endregion
 
@@ -80,6 +84,23 @@ namespace Assets.Scripts.Arena
                     {
                         GUI.Label(new Rect(120, 10, 400, 50),
                             String.Format("Selected Object: {0}", _selectedDeployable.name));
+
+
+                        //if (_selectedObjectProperties != null)
+                        //{
+                        //    for (int i = 0; i < _selectedObjectProperties.Count; i++)
+                        //    {
+                        //        GUI.Label(new Rect(10, 600 + (i*45), 400, 50), _selectedObjectProperties[i].CanWrite + " " + _selectedObjectProperties[i].Name);
+                        //    }
+                        //}
+
+                        if (_booleanProperties != null)
+                        {
+                            for (int i = 0; i < _booleanProperties.Count; i++)
+                            {
+                                _booleanPropertiesValues[i] = GUI.Toggle(new Rect(10, 600 + (i*45), 400, 50), _booleanPropertiesValues[i], _booleanProperties[i].Name);
+                            }
+                        }
                     }
                     break;
                 case BrainStates.CreationMode:
@@ -239,6 +260,8 @@ namespace Assets.Scripts.Arena
                     GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Empty);
                     _selectedObjectDeltaPosition = _selectedDeployable.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     _selectedObjectDeltaPosition.z = 0;
+
+                    UpdatePropertiesList();
                 }
                 else
                 {
@@ -267,6 +290,27 @@ namespace Assets.Scripts.Arena
 
                 _isDown = false;
                 _allowToMove = false;
+            }
+        }
+
+        private void UpdatePropertiesList()
+        {
+            _selectedObjectProperties = new List<PropertyInfo>();
+            _booleanProperties = new List<PropertyInfo>();
+            _booleanPropertiesValues = new List<bool>();
+
+            _selectedObjectProperties = _selectedDeployable.GetInGameProperties();
+
+            if (_selectedDeployable != null)
+            {
+                foreach (PropertyInfo prop in _selectedObjectProperties)
+                {
+                    if (prop.PropertyType == typeof (bool))
+                    {
+                        _booleanProperties.Add(prop);
+                        _booleanPropertiesValues.Add(Convert.ToBoolean(prop.GetValue(_selectedDeployable, null)));
+                    }
+                }
             }
         }
 

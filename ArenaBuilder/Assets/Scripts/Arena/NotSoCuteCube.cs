@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Arena
+﻿using System;
+
+namespace Assets.Scripts.Arena
 {
     public class NotSoCuteCube : Deployable
     {
@@ -10,5 +12,6 @@
         {
             return "Not So Cute Cube";
         }
+
     }
 }

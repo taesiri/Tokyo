@@ -10,5 +10,9 @@
         {
             return "BIG CUBE";
         }
+
+        public void Start()
+        {
+        }
     }
 }
