@@ -33,7 +33,7 @@ namespace Assets.Scripts.Arena
             }
         }
 
-        #endregion
+       #endregion
 
         #region DebugOnly
 

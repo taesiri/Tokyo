@@ -29,6 +29,13 @@ namespace Assets.Scripts.Arena
         private Deployable _selectedDeployable;
         private Vector3 _selectedObjectDeltaPosition;
 
+        private bool _gridLinesVisibilityStatus = true;
+        public bool ShowGridLines
+        {
+            get { return _gridLinesVisibilityStatus; }
+            set { _gridLinesVisibilityStatus = value; }
+        }
+
         #endregion
 
         #region GUIHelpers
