@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Xml;
 using Assets.Scripts.Helpers;
 using UnityEngine;
@@ -80,7 +81,7 @@ namespace Assets.Scripts.Arena
 
                     for (int i = 0; i < DeployableList.Count; i++)
                     {
-                        if (GUI.RepeatButton(new Rect(i*150, 150, 150, 50), DeployableList[i].GetDisplayName()))
+                        if (GUI.RepeatButton(new Rect(i*155, 150, 150, 50), DeployableList[i].GetDisplayName()))
                         {
                             if (DeployableList[i].DeploymentMethod == DeploymentMethod.Drag)
                             {
@@ -98,15 +99,18 @@ namespace Assets.Scripts.Arena
             }
 
 
-            if (GUI.Button(new Rect(400, 30, 80, 50), "SAVE"))
+            if (GUI.Button(new Rect(10, 260, 80, 50), "SAVE"))
             {
                 SaveDataToXML();
             }
-            if (GUI.Button(new Rect(400, 100, 80, 50), "LOAD"))
+            if (GUI.Button(new Rect(10, 310, 80, 50), "LOAD"))
             {
                 LoadDataFromXML();
             }
-
+            if (GUI.Button(new Rect(10, 360, 80, 50), "Clear"))
+            {
+                ClearGrid();
+            }
             UpdateBrainState();
         }
 
@@ -132,24 +136,27 @@ namespace Assets.Scripts.Arena
 
         public void Update()
         {
-            switch (BrainState)
+            if (GUIUtility.hotControl == 0)
             {
-                case BrainStates.PlayMode:
-                    break;
-                case BrainStates.EraserMode:
-                    EraserUpdate();
-                    break;
-                case BrainStates.EditMode:
-                    EditUpdate();
-                    break;
-                case BrainStates.CreationMode:
-                    CreationUpdate();
-                    //#if UNITY_IPHONE || UNITY_ANDROID
-                    //            HandleTouchEvents();
-                    //#elif !UNITY_FLASH
-                    //              CreationUpdate();
-                    //#endif
-                    break;
+                switch (BrainState)
+                {
+                    case BrainStates.PlayMode:
+                        break;
+                    case BrainStates.EraserMode:
+                        EraserUpdate();
+                        break;
+                    case BrainStates.EditMode:
+                        EditUpdate();
+                        break;
+                    case BrainStates.CreationMode:
+                        CreationUpdate();
+                        //#if UNITY_IPHONE || UNITY_ANDROID
+                        //            HandleTouchEvents();
+                        //#elif !UNITY_FLASH
+                        //              CreationUpdate();
+                        //#endif
+                        break;
+                }
             }
         }
 
@@ -286,6 +293,11 @@ namespace Assets.Scripts.Arena
             GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Full);
         }
 
+        public void ClearGrid()
+        {
+            GameGrid.ClearEntireGrid();
+        }
+
         public void SaveDataToXML()
         {
             Deployable[] childs = GameGrid.GetAllChildren();
@@ -295,6 +307,8 @@ namespace Assets.Scripts.Arena
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("Tiles");
+                writer.WriteAttributeString("Row", GameGrid.Rows.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Column", GameGrid.Columns.ToString(CultureInfo.InvariantCulture));
 
                 foreach (Deployable child in childs)
                 {
@@ -319,14 +333,34 @@ namespace Assets.Scripts.Arena
 
             if (reader.DocumentElement != null)
             {
-                foreach (XmlNode node in reader.DocumentElement.ChildNodes)
-                {
-                    var index = new IntVector2(node.Attributes["GridIndex"].InnerText);
-                    string objectName = node.Attributes["Name"].InnerText;
+                int row = Convert.ToInt32(reader.DocumentElement.Attributes["Row"].InnerText);
+                int column = Convert.ToInt32(reader.DocumentElement.Attributes["Column"].InnerText);
 
-                    GameGrid.DeployIfPossible(index, _deployableDictionary[objectName]);
+
+                if (GameGrid.Rows == row && GameGrid.Columns == column)
+                {
+                    foreach (XmlNode node in reader.DocumentElement.ChildNodes)
+                    {
+                        if (node.Attributes != null)
+                        {
+                            var index = new IntVector2(node.Attributes["GridIndex"].InnerText);
+                            string objectName = node.Attributes["Name"].InnerText;
+
+                            GameGrid.DeployIfPossible(index, _deployableDictionary[objectName]);
+                        }
+                    }
+                }
+                else
+                {
+                    // Grid Size is Different!   
+                    //TODO : Change Grid Size
+                    UpdateGridSize();
                 }
             }
+        }
+
+        public void UpdateGridSize()
+        {
         }
     }
 }

@@ -264,6 +264,24 @@ namespace Assets.Scripts.Arena
             }
         }
 
+        public void ClearEntireGrid()
+        {
+            for (int i = 0; i < Cells.Length; i++)
+            {
+                Cells[i].IsEmpty = true;
+                Cells[i].InCellObject = null;
+            }
+            var deleteList = new Transform[ChildTransform.childCount];
+            //Consider another way! 
+            for (int i = 0; i < ChildTransform.childCount; i++)
+            {
+                deleteList[i] = ChildTransform.GetChild(i);
+            }
+            foreach (Transform t in deleteList)
+            {
+                Destroy(t.gameObject);
+            }
+        }
 
         public Deployable[] GetAllChildren()
         {
