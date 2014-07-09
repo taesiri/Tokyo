@@ -11,9 +11,14 @@ namespace Assets.Scripts.Arena
     {
         public DeploymentMethod DeploymentMethod;
         public IntVector2 GridIndex;
+        public List<PropertyInfo> ListOfAllProperties;
+        public List<string> NamesOfAllProperties;
         public AdvanceGridCell ParentAdvanceGridCell;
         public GridCell ParentGridCell;
         [SerializeField] public TileMap TileMap;
+        private bool _isBlack;
+        private Color _selfColor = Color.yellow;
+
 
         [InGameProperty(Name = "Display Name")]
         public string CustomProperty1
@@ -21,17 +26,72 @@ namespace Assets.Scripts.Arena
             get { return GetDisplayName(); }
         }
 
-        [InGameProperty(Name = "IsItActive")]
+        [InGameProperty(Name = "Is It Active")]
         public bool IsItActive { get; set; }
 
+
+        [InGameProperty(Name = "Toggle Back Color")]
+        public bool GoBlack
+        {
+            get { return _isBlack; }
+            set
+            {
+                renderer.material.color = value ? Color.black : _selfColor;
+                _isBlack = value;
+            }
+        }
+
+
+        public void Start()
+        {
+            _selfColor = renderer.material.color;
+        }
 
         public abstract void OnTick();
         public abstract string GetDisplayName();
 
         public List<PropertyInfo> GetInGameProperties()
         {
-            return GetType().GetProperties().Where(prop => Attribute.IsDefined(prop, typeof (InGameProperty))).ToList();
+            if (ListOfAllProperties == null)
+            {
+                ListOfAllProperties = new List<PropertyInfo>();
+                UpdateListOfInGameProperties();
+            }
+            return ListOfAllProperties;
         }
 
+        public void UpdateListOfInGameProperties()
+        {
+            ListOfAllProperties = GetType().GetProperties().Where(prop => Attribute.IsDefined(prop, typeof (InGameProperty))).ToList();
+        }
+
+        public List<string> GetInGamePropertiesNames()
+        {
+            if (NamesOfAllProperties == null)
+            {
+                NamesOfAllProperties = new List<string>();
+
+                if (ListOfAllProperties == null)
+                {
+                    ListOfAllProperties = new List<PropertyInfo>();
+                    UpdateListOfInGameProperties();
+                }
+
+                foreach (PropertyInfo prop in ListOfAllProperties)
+                {
+                    object[] attr = prop.GetCustomAttributes(true);
+
+                    foreach (object atr in attr)
+                    {
+                        var igpAttr = atr as InGameProperty;
+                        if (igpAttr != null)
+                        {
+                            NamesOfAllProperties.Add(igpAttr.Name);
+                        }
+                    }
+                }
+            }
+            return NamesOfAllProperties;
+        }
     }
 }

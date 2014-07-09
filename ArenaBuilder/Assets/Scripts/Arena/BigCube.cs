@@ -11,8 +11,9 @@
             return "BIG CUBE";
         }
 
-        public void Start()
+        public new void Start()
         {
+            base.Start();
             IsItActive = false;
         }
     }
