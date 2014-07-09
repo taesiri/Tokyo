@@ -99,6 +99,9 @@ namespace Assets.Scripts.Arena
                             for (int i = 0; i < _booleanProperties.Count; i++)
                             {
                                 _booleanPropertiesValues[i] = GUI.Toggle(new Rect(10, 600 + (i*45), 400, 50), _booleanPropertiesValues[i], _booleanProperties[i].Name);
+                                
+                                // Worst Way possbile to handle changes!
+                                _booleanProperties[i].SetValue(_selectedDeployable, _booleanPropertiesValues[i], null);
                             }
                         }
                     }

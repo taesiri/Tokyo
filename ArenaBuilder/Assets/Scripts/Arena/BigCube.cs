@@ -13,6 +13,7 @@
 
         public void Start()
         {
+            IsItActive = false;
         }
     }
 }

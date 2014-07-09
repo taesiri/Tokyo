@@ -32,5 +32,6 @@ namespace Assets.Scripts.Arena
         {
             return GetType().GetProperties().Where(prop => Attribute.IsDefined(prop, typeof (InGameProperty))).ToList();
         }
+
     }
 }

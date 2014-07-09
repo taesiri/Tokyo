@@ -12,7 +12,7 @@
         public void Start()
         {
             CustomProperty2 = "Change in Start!";
-            IsItActive = transform;
+            IsItActive = true;
         }
 
         public override string GetDisplayName()
