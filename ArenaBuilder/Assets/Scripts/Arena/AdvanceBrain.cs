@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using System.Xml;
 using Assets.Scripts.Helpers;
 using UnityEngine;
@@ -34,18 +33,11 @@ namespace Assets.Scripts.Arena
 
         #region GUIHelpers
 
+        public static bool AllowOthersToDrawOnGUI = false;
         private readonly GUILocationHelper _location = new GUILocationHelper();
         private readonly string[] _menuStrings = {"Create", "Edit", "Erase", "Play!"};
         private Matrix4x4 _guiMatrix;
         private int _menuSelectedIndex;
-
-        #endregion
-
-        #region PropertySystem
-
-        private List<PropertyInfo> _booleanProperties;
-        private ObservableList<bool> _booleanPropertiesValues;
-        private List<PropertyInfo> _selectedObjectProperties;
 
         #endregion
 
@@ -84,23 +76,6 @@ namespace Assets.Scripts.Arena
                     {
                         GUI.Label(new Rect(120, 10, 400, 50),
                             String.Format("Selected Object: {0}", _selectedDeployable.name));
-
-
-                        //if (_selectedObjectProperties != null)
-                        //{
-                        //    for (int i = 0; i < _selectedObjectProperties.Count; i++)
-                        //    {
-                        //        GUI.Label(new Rect(10, 600 + (i*45), 400, 50), _selectedObjectProperties[i].CanWrite + " " + _selectedObjectProperties[i].Name);
-                        //    }
-                        //}
-
-                        if (_booleanProperties != null)
-                        {
-                            for (int i = 0; i < _booleanProperties.Count; i++)
-                            {
-                                _booleanPropertiesValues[i] = GUI.Toggle(new Rect(10, 600 + (i*45), 400, 50), _booleanPropertiesValues[i], _booleanProperties[i].Name);
-                            }
-                        }
                     }
                     break;
                 case BrainStates.CreationMode:
@@ -148,16 +123,21 @@ namespace Assets.Scripts.Arena
             {
                 case 0:
                     BrainState = BrainStates.CreationMode;
+                    AllowOthersToDrawOnGUI = false;
                     break;
                 case 1:
                     BrainState = BrainStates.EditMode;
+                    AllowOthersToDrawOnGUI = true;
                     break;
                 case 2:
                     BrainState = BrainStates.EraserMode;
+                    AllowOthersToDrawOnGUI = false;
                     break;
                 case 3:
                     BrainState = BrainStates.PlayMode;
+                    AllowOthersToDrawOnGUI = false;
                     break;
+                    AllowOthersToDrawOnGUI = false;
             }
         }
 
@@ -254,14 +234,17 @@ namespace Assets.Scripts.Arena
                 Physics.Raycast(ray, out hitInfo, 100, 1 << 9);
                 if (hitInfo.collider)
                 {
+                    if (_selectedDeployable)
+                        _selectedDeployable.AllowToDrawGUI = false;
+
+
                     _selectedDeployable = hitInfo.collider.gameObject.GetComponent<Deployable>();
 
                     _allowToMove = true;
                     GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Empty);
                     _selectedObjectDeltaPosition = _selectedDeployable.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     _selectedObjectDeltaPosition.z = 0;
-
-                    UpdatePropertiesList();
+                    _selectedDeployable.AllowToDrawGUI = true;
                 }
                 else
                 {
@@ -293,33 +276,6 @@ namespace Assets.Scripts.Arena
             }
         }
 
-        private void UpdatePropertiesList()
-        {
-            _selectedObjectProperties = new List<PropertyInfo>();
-            _booleanProperties = new List<PropertyInfo>();
-            _booleanPropertiesValues = new ObservableList<bool>();
-
-            _selectedObjectProperties = _selectedDeployable.GetInGameProperties();
-
-
-            if (_selectedDeployable != null)
-            {
-                foreach (PropertyInfo prop in _selectedObjectProperties)
-                {
-                    if (prop.PropertyType == typeof (bool))
-                    {
-                        _booleanProperties.Add(prop);
-                        _booleanPropertiesValues.Add(Convert.ToBoolean(prop.GetValue(_selectedDeployable, null)));
-                    }
-                }
-            }
-            _booleanPropertiesValues.Changed += _booleanPropertiesValues_Changed;
-        }
-
-        public void _booleanPropertiesValues_Changed(int index)
-        {
-            _booleanProperties[index].SetValue(_selectedDeployable, _booleanPropertiesValues[index], null);
-        }
 
         private void EraserUpdate()
         {
