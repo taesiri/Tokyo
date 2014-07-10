@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Assets.Scripts.Helpers;
@@ -36,13 +37,16 @@ namespace Assets.Scripts.Arena
         #region InGameProperties
 
         [InGameProperty(Name = "Display Name")]
-        public string CustomProperty1
-        {
-            get { return GetDisplayName(); }
-        }
+        public string DisplayName { get; set; }
 
         [InGameProperty(Name = "Is It Active")]
         public bool IsItActive { get; set; }
+
+        [InGameProperty(Name = "Custom Int Property")]
+        public int MyIntProperty { get; set; }
+
+        [InGameProperty(Name = "Custom Float Property")]
+        public float MyFloatProperty { get; set; }
 
 
         [InGameProperty(Name = "Toggle Back Color")]
@@ -122,17 +126,17 @@ namespace Assets.Scripts.Arena
 
         private void _integerPropertiesValues_Changed(int index)
         {
-            _integerGameProperties[index].GamePropertyInfo.SetValue(this, _booleanPropertiesValues[index], null);
+            _integerGameProperties[index].GamePropertyInfo.SetValue(this, _integerPropertiesValues[index], null);
         }
 
         private void _floatPropertiesValues_Changed(int index)
         {
-            _floatGameProperties[index].GamePropertyInfo.SetValue(this, _booleanPropertiesValues[index], null);
+            _floatGameProperties[index].GamePropertyInfo.SetValue(this, _floatPropertiesValues[index], null);
         }
 
         private void _stringPropertiesValues_Changed(int index)
         {
-            _stringGameProperties[index].GamePropertyInfo.SetValue(this, _booleanPropertiesValues[index], null);
+            _stringGameProperties[index].GamePropertyInfo.SetValue(this, _stringPropertiesValues[index], null);
         }
 
 
@@ -174,6 +178,8 @@ namespace Assets.Scripts.Arena
 
         #region GUI
 
+        public Vector2 ScrollPosition = Vector2.zero;
+
         public void OnGUI()
         {
             if (AllowToDrawGUI && AdvanceBrain.AllowOthersToDrawOnGUI)
@@ -182,13 +188,53 @@ namespace Assets.Scripts.Arena
                     UpdateListOfProperties();
 
 
+                ScrollPosition = GUI.BeginScrollView(new Rect(25, 500, 400, 200), ScrollPosition, new Rect(0, 0, 500, 500));
+
+                int offset = 0;
                 if (_booleanGameProperties != null)
                 {
                     for (int i = 0, n = _booleanGameProperties.Count; i < n; i++)
                     {
-                        _booleanPropertiesValues[i] = GUI.Toggle(new Rect(10, 500 + (i*45), 400, 50), _booleanPropertiesValues[i], _booleanGameProperties[i].PropertyName);
+                        _booleanPropertiesValues[i] = GUI.Toggle(new Rect(0, (i * 30), 400, 25), _booleanPropertiesValues[i], _booleanGameProperties[i].PropertyName);
+                    }
+
+                    offset += _booleanGameProperties.Count;
+                }
+
+
+                if (_integerGameProperties != null)
+                {
+                    for (int i = 0, n = _integerGameProperties.Count; i < n; i++)
+                    {
+                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _integerGameProperties[i].PropertyName);
+                        _integerPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _integerPropertiesValues[i].ToString(CultureInfo.InvariantCulture)));
+                    }
+                    offset += _integerGameProperties.Count;
+                }
+
+
+                if (_floatGameProperties != null)
+                {
+                    for (int i = 0, n = _floatGameProperties.Count; i < n; i++)
+                    {
+                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _floatGameProperties[i].PropertyName);
+                        _floatPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture)));
+                    }
+                    offset += _floatGameProperties.Count;
+                }
+
+
+                if (_stringGameProperties != null)
+                {
+                    for (int i = 0, n = _stringGameProperties.Count; i < n; i++)
+                    {
+                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _stringGameProperties[i].PropertyName);
+                        _stringPropertiesValues[i] = GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _stringPropertiesValues[i]);
                     }
                 }
+
+                GUI.EndScrollView();
+
 
                 // TODO: Other Types of Properties
             }

@@ -137,7 +137,6 @@ namespace Assets.Scripts.Arena
                     BrainState = BrainStates.PlayMode;
                     AllowOthersToDrawOnGUI = false;
                     break;
-                    AllowOthersToDrawOnGUI = false;
             }
         }
 
@@ -158,11 +157,6 @@ namespace Assets.Scripts.Arena
                         break;
                     case BrainStates.CreationMode:
                         CreationUpdate();
-                        //#if UNITY_IPHONE || UNITY_ANDROID
-                        //            HandleTouchEvents();
-                        //#elif !UNITY_FLASH
-                        //              CreationUpdate();
-                        //#endif
                         break;
                 }
             }
