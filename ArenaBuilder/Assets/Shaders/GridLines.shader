@@ -57,7 +57,7 @@
         // FRAGMENT SHADER
         float4 frag(vertexOutput input) : COLOR {
 		  if(_IsEnable != 0) {
-			if (input.worldPos.x  > _StartPosition.x & input.worldPos.x < _EndPosition.x & input.worldPos.y  > _StartPosition.y & input.worldPos.y < _EndPosition.y) {
+			if (input.worldPos.x  > _StartPosition.x && input.worldPos.x < _EndPosition.x && input.worldPos.y  > _StartPosition.y && input.worldPos.y < _EndPosition.y) {
 				return _CellMaskColour;
 			}
 		  } 
