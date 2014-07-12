@@ -11,6 +11,7 @@ namespace Assets.Scripts.Arena
     public abstract class Deployable : MonoBehaviour
     {
         public bool AllowToDrawGUI = false;
+        public GUISkin MasterGUISkin;
         public DeploymentMethod DeploymentMethod;
         public IntVector2 GridIndex;
         public AdvanceGridCell ParentAdvanceGridCell;
@@ -171,6 +172,12 @@ namespace Assets.Scripts.Arena
         public void Start()
         {
             _selfColor = renderer.material.color;
+
+            if (MasterGUISkin == null)
+            {
+                var gSking = Resources.Load("GUISkin/defaultGUIStyle", typeof (GUISkin)) as GUISkin;
+                MasterGUISkin = gSking;
+            }
         }
 
         public abstract void OnTick();
@@ -188,26 +195,25 @@ namespace Assets.Scripts.Arena
                     UpdateListOfProperties();
 
 
-                ScrollPosition = GUI.BeginScrollView(new Rect(25, 500, 400, 200), ScrollPosition, new Rect(0, 0, 500, 500));
+                ScrollPosition = GUI.BeginScrollView(new Rect(25, 500, 400, 200), ScrollPosition, new Rect(0, 0, 500, 500), MasterGUISkin.horizontalScrollbar, MasterGUISkin.verticalScrollbar);
 
                 int offset = 0;
                 if (_booleanGameProperties != null)
                 {
                     for (int i = 0, n = _booleanGameProperties.Count; i < n; i++)
                     {
-                        _booleanPropertiesValues[i] = GUI.Toggle(new Rect(0, (i * 30), 400, 25), _booleanPropertiesValues[i], _booleanGameProperties[i].PropertyName);
+                        _booleanPropertiesValues[i] = GUI.Toggle(new Rect(0, (i*30), 400, 25), _booleanPropertiesValues[i], _booleanGameProperties[i].PropertyName, MasterGUISkin.toggle);
                     }
 
                     offset += _booleanGameProperties.Count;
                 }
 
-
                 if (_integerGameProperties != null)
                 {
                     for (int i = 0, n = _integerGameProperties.Count; i < n; i++)
                     {
-                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _integerGameProperties[i].PropertyName);
-                        _integerPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _integerPropertiesValues[i].ToString(CultureInfo.InvariantCulture)));
+                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _integerGameProperties[i].PropertyName, MasterGUISkin.label);
+                        _integerPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _integerPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
                     }
                     offset += _integerGameProperties.Count;
                 }
@@ -217,8 +223,8 @@ namespace Assets.Scripts.Arena
                 {
                     for (int i = 0, n = _floatGameProperties.Count; i < n; i++)
                     {
-                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _floatGameProperties[i].PropertyName);
-                        _floatPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture)));
+                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _floatGameProperties[i].PropertyName, MasterGUISkin.label);
+                        _floatPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
                     }
                     offset += _floatGameProperties.Count;
                 }
@@ -228,8 +234,8 @@ namespace Assets.Scripts.Arena
                 {
                     for (int i = 0, n = _stringGameProperties.Count; i < n; i++)
                     {
-                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _stringGameProperties[i].PropertyName);
-                        _stringPropertiesValues[i] = GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _stringPropertiesValues[i]);
+                        GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _stringGameProperties[i].PropertyName, MasterGUISkin.label);
+                        _stringPropertiesValues[i] = GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _stringPropertiesValues[i], MasterGUISkin.textField);
                     }
                 }
 
