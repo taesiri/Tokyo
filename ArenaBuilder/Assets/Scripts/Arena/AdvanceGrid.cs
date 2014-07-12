@@ -68,8 +68,9 @@ namespace Assets.Scripts.Arena
             _planeBottomLeftPosition = PlaneTransform.position - new Vector3(_boundX/2f, _boundY/2f, _boundZ/2f);
         }
 
-        public bool IsPlaceableWithOffset(TileMap tile, IntVector2 cellIndex)
+        public bool IsPlaceableWithOffset(TileMap tile, IntVector2 cellIndex, IntVector2 deltaOffset)
         {
+            cellIndex = cellIndex - deltaOffset;
             for (int i = 0; i < tile.TileSize.X; i++)
             {
                 for (int j = 0; j < tile.TileSize.Y; j++)
@@ -91,7 +92,7 @@ namespace Assets.Scripts.Arena
             return true;
         }
 
-        public void DrawGhostTiles(Ray ray, Deployable deployableObject)
+        public void DrawGhostTiles(Ray ray, Deployable deployableObject, IntVector2 deltaOffset)
         {
             RaycastHit hitInfo;
             Physics.Raycast(ray, out hitInfo, 100, 1 << 10);
@@ -99,13 +100,15 @@ namespace Assets.Scripts.Arena
             {
                 Vector3 loc = hitInfo.point - _planeBottomLeftPosition;
                 var index = new IntVector2(loc.x*Columns/_boundX, loc.y*Rows/_boundY);
+                IntVector2 ghostIndex = index - deltaOffset - new IntVector2(0, deployableObject.TileMap.TileSize.Y - 1);
 
-                Vector3 dpPos = deployableObject.transform.position;
 
-                GridLinesMaterial.SetColor("_CellMaskColour", IsPlaceableWithOffset(deployableObject.TileMap, index) ? new Color(0, 1.0f, 0, 0.8f) : new Color(1.0f, 0, 0, 0.8f));
+                Vector3 firstPoint = IndexToWorldPositionWithNoOffset(ghostIndex);
+                Vector3 secondPoint = firstPoint + new Vector3(deployableObject.TileMap.TileSize.X, deployableObject.TileMap.TileSize.Y, 0);
 
-                GridLinesMaterial.SetVector("_StartPosition", new Vector4(dpPos.x - deployableObject.TileMap.TileSize.X/2f, dpPos.y - deployableObject.TileMap.TileSize.Y/2f, 0, 0));
-                GridLinesMaterial.SetVector("_EndPosition", new Vector4(dpPos.x + deployableObject.TileMap.TileSize.X/2f, dpPos.y + deployableObject.TileMap.TileSize.Y/2f, 0, 0));
+                GridLinesMaterial.SetColor("_CellMaskColour", IsPlaceableWithOffset(deployableObject.TileMap, index, deltaOffset) ? new Color(0, 1.0f, 0, 0.4f) : new Color(1.0f, 0, 0, 0.4f));
+                GridLinesMaterial.SetVector("_StartPosition", firstPoint);
+                GridLinesMaterial.SetVector("_EndPosition", secondPoint);
             }
         }
 
@@ -139,7 +142,7 @@ namespace Assets.Scripts.Arena
         }
 
 
-        public bool DropDeployableIfPossible(Ray ray, Deployable deployableObject)
+        public bool DropDeployableIfPossible(Ray ray, Deployable deployableObject, IntVector2 deltaOffset)
         {
             RaycastHit hitInfo;
             Physics.Raycast(ray, out hitInfo, 100, 1 << 10);
@@ -147,8 +150,9 @@ namespace Assets.Scripts.Arena
             {
                 Vector3 loc = hitInfo.point - _planeBottomLeftPosition;
                 var index = new IntVector2(loc.x*Columns/_boundX, loc.y*Rows/_boundY);
+                index = index - deltaOffset;
 
-                if (IsPlaceableWithOffset(deployableObject.TileMap, index))
+                if (IsPlaceableWithOffset(deployableObject.TileMap, index, new IntVector2()))
                 {
                     Vector3 pos = IndexToWorldPosition(index);
                     Vector2 wOffset = deployableObject.TileMap.GetWorldTransformOffset(GlobalCellWidth);
@@ -176,7 +180,7 @@ namespace Assets.Scripts.Arena
                 Vector3 loc = hitInfo.point - _planeBottomLeftPosition;
                 var index = new IntVector2(loc.x*Columns/_boundX, loc.y*Rows/_boundY);
 
-                if (IsPlaceableWithOffset(deployableObject.TileMap, index))
+                if (IsPlaceableWithOffset(deployableObject.TileMap, index, new IntVector2()))
                 {
                     Vector3 pos = IndexToWorldPosition(index);
                     Vector2 wOffset = deployableObject.TileMap.GetWorldTransformOffset(GlobalCellWidth);
@@ -196,7 +200,7 @@ namespace Assets.Scripts.Arena
 
         public bool DeployIfPossible(IntVector2 index, Deployable deployableObject)
         {
-            if (IsPlaceableWithOffset(deployableObject.TileMap, index))
+            if (IsPlaceableWithOffset(deployableObject.TileMap, index, new IntVector2()))
             {
                 Vector3 pos = IndexToWorldPosition(index);
                 Vector2 wOffset = deployableObject.TileMap.GetWorldTransformOffset(GlobalCellWidth);
@@ -250,6 +254,12 @@ namespace Assets.Scripts.Arena
             return index.X + (index.Y*Rows);
         }
 
+        public Vector3 IndexToWorldPositionWithNoOffset(IntVector2 index)
+        {
+            var pos = new Vector3(_planeBottomLeftPosition.x + index.X*GlobalCellWidth, _planeBottomLeftPosition.y + index.Y*GlobalCellWidth, 0);
+            return pos;
+        }
+
         public Vector3 IndexToWorldPosition(IntVector2 index)
         {
             var pos = new Vector3(_planeBottomLeftPosition.x + index.X*GlobalCellWidth, _planeBottomLeftPosition.y + index.Y*GlobalCellWidth, 0);
@@ -261,6 +271,12 @@ namespace Assets.Scripts.Arena
         {
             // NOT Implemented!
             return new IntVector2();
+        }
+
+        public IntVector2 PointOnPlaneToIndex(Vector3 position)
+        {
+            Vector3 loc = position - _planeBottomLeftPosition;
+            return new IntVector2(loc.x*Columns/_boundX, loc.y*Rows/_boundY);
         }
 
 

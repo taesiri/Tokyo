@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using UnityEngine;
 
 namespace Assets.Scripts.Helpers
@@ -44,6 +43,17 @@ namespace Assets.Scripts.Helpers
         public override string ToString()
         {
             return String.Format("{0},{1}", X, Y);
+        }
+
+
+        public static IntVector2 operator +(IntVector2 iv1, IntVector2 iv2)
+        {
+            return new IntVector2(iv1.X + iv2.X, iv1.Y + iv2.Y);
+        }
+
+        public static IntVector2 operator -(IntVector2 iv1, IntVector2 iv2)
+        {
+            return new IntVector2(iv1.X - iv2.X, iv1.Y - iv2.Y);
         }
     }
 }

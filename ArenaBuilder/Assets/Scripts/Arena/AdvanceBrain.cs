@@ -16,6 +16,7 @@ namespace Assets.Scripts.Arena
         public List<Deployable> DeployableList;
         public AdvanceGrid GameGrid;
         private bool _allowMove;
+        private IntVector2 _deltaIndexOffset;
         private Dictionary<string, Deployable> _deployableDictionary;
         private bool _gridLinesVisibilityStatus = true;
         private bool _isDown;
@@ -244,9 +245,13 @@ namespace Assets.Scripts.Arena
                     _selectedDeployable = hitInfo.collider.gameObject.GetComponent<Deployable>();
 
                     AllowToMove = true;
+
+                    _deltaIndexOffset = GameGrid.PointOnPlaneToIndex(hitInfo.point) - _selectedDeployable.GridIndex;
+
                     GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Empty);
                     _selectedObjectDeltaPosition = _selectedDeployable.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     _selectedObjectDeltaPosition.z = 0;
+
                     _selectedDeployable.AllowToDrawGUI = true;
                 }
                 else
@@ -262,7 +267,7 @@ namespace Assets.Scripts.Arena
                 _selectedDeployable.transform.position = pos + _selectedObjectDeltaPosition;
 
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                GameGrid.DrawGhostTiles(ray, _selectedDeployable);
+                GameGrid.DrawGhostTiles(ray, _selectedDeployable, _deltaIndexOffset);
             }
 
             if (Input.GetMouseButtonUp(0))
@@ -271,14 +276,17 @@ namespace Assets.Scripts.Arena
                 {
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                    if (!GameGrid.DropDeployableIfPossible(ray, _selectedDeployable))
+                    if (!GameGrid.DropDeployableIfPossible(ray, _selectedDeployable, _deltaIndexOffset))
                     {
+                        Debug.Log("Do Reset!");
                         ResetSelectedObjectPosition();
                     }
                 }
 
                 _isDown = false;
                 AllowToMove = false;
+
+                _deltaIndexOffset = null;
             }
         }
 

@@ -20,6 +20,8 @@ namespace Assets.Scripts.Arena
         private bool _isBlack;
         private Color _selfColor = Color.yellow;
 
+        public IntVector2 SelctedTileIndex;
+
         #region PropertyProxy
 
         public List<PropertyInfo> ListOfAllProperties;
