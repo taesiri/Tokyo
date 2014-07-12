@@ -30,8 +30,8 @@
         uniform float4 _GridColour;
         uniform float4 _BaseColour;
         uniform float4 _CellMaskColour;
-        uniform vector _StartPosition;
-        uniform vector _EndPosition;
+        uniform float4 _StartPosition;
+        uniform float4 _EndPosition;
         uniform float _IsEnable;
      
         // Input into the vertex shader
