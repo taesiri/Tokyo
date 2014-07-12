@@ -43,6 +43,12 @@ namespace Assets.Scripts.Arena
 
         #endregion
 
+        #region GhostOptimization
+
+        private IntVector2 _lastIndex;
+
+        #endregion
+
         public void Start()
         {
             UpdatePlaneDetails();
@@ -100,15 +106,21 @@ namespace Assets.Scripts.Arena
             {
                 Vector3 loc = hitInfo.point - _planeBottomLeftPosition;
                 var index = new IntVector2(loc.x*Columns/_boundX, loc.y*Rows/_boundY);
-                IntVector2 ghostIndex = index - deltaOffset - new IntVector2(0, deployableObject.TileMap.TileSize.Y - 1) - new IntVector2(deployableObject.TileMap.TileOffset.X, -deployableObject.TileMap.TileOffset.Y);
 
+                if (_lastIndex != index)
+                {
 
-                Vector3 firstPoint = IndexToWorldPositionWithNoOffset(ghostIndex);
-                Vector3 secondPoint = firstPoint + new Vector3(deployableObject.TileMap.TileSize.X, deployableObject.TileMap.TileSize.Y, 0);
+                    IntVector2 ghostIndex = index - deltaOffset - new IntVector2(0, deployableObject.TileMap.TileSize.Y - 1) - new IntVector2(deployableObject.TileMap.TileOffset.X, -deployableObject.TileMap.TileOffset.Y);
 
-                GridLinesMaterial.SetColor("_CellMaskColour", IsPlaceableWithOffset(deployableObject.TileMap, index, deltaOffset) ? new Color(0, 1.0f, 0, 0.4f) : new Color(1.0f, 0, 0, 0.4f));
-                GridLinesMaterial.SetVector("_StartPosition", firstPoint);
-                GridLinesMaterial.SetVector("_EndPosition", secondPoint);
+                    Vector3 firstPoint = IndexToWorldPositionWithNoOffset(ghostIndex);
+                    Vector3 secondPoint = firstPoint + new Vector3(deployableObject.TileMap.TileSize.X, deployableObject.TileMap.TileSize.Y, 0);
+
+                    GridLinesMaterial.SetColor("_CellMaskColour", IsPlaceableWithOffset(deployableObject.TileMap, index, deltaOffset) ? new Color(0, 1.0f, 0, 0.4f) : new Color(1.0f, 0, 0, 0.4f));
+                    GridLinesMaterial.SetVector("_StartPosition", firstPoint);
+                    GridLinesMaterial.SetVector("_EndPosition", secondPoint);
+
+                    _lastIndex = index;
+                }
             }
         }
 
