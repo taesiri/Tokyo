@@ -100,7 +100,7 @@ namespace Assets.Scripts.Arena
             {
                 Vector3 loc = hitInfo.point - _planeBottomLeftPosition;
                 var index = new IntVector2(loc.x*Columns/_boundX, loc.y*Rows/_boundY);
-                IntVector2 ghostIndex = index - deltaOffset - new IntVector2(0, deployableObject.TileMap.TileSize.Y - 1);
+                IntVector2 ghostIndex = index - deltaOffset - new IntVector2(0, deployableObject.TileMap.TileSize.Y - 1) - new IntVector2(deployableObject.TileMap.TileOffset.X, -deployableObject.TileMap.TileOffset.Y);
 
 
                 Vector3 firstPoint = IndexToWorldPositionWithNoOffset(ghostIndex);
