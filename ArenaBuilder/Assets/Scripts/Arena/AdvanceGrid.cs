@@ -17,6 +17,7 @@ namespace Assets.Scripts.Arena
 
         #region PlaneFields
 
+        public Material GridLinesMaterial;
         public Transform GridLinesTransform;
         public Transform PlaneTransform;
         private float _boundX;
@@ -33,7 +34,7 @@ namespace Assets.Scripts.Arena
             }
         }
 
-       #endregion
+        #endregion
 
         #region DebugOnly
 
@@ -51,6 +52,11 @@ namespace Assets.Scripts.Arena
             {
                 Cells[i] = new AdvanceGridCell {IsEmpty = true, ParentGrid = this};
             }
+
+            if (GridLinesTransform)
+            {
+                GridLinesMaterial = GridLinesTransform.renderer.material;
+            }
         }
 
         private void UpdatePlaneDetails()
@@ -60,10 +66,6 @@ namespace Assets.Scripts.Arena
             _boundZ = PlaneTransform.renderer.bounds.size.z;
 
             _planeBottomLeftPosition = PlaneTransform.position - new Vector3(_boundX/2f, _boundY/2f, _boundZ/2f);
-        }
-
-        public void Update()
-        {
         }
 
         public bool IsPlaceableWithOffset(TileMap tile, IntVector2 cellIndex)
@@ -88,6 +90,25 @@ namespace Assets.Scripts.Arena
             }
             return true;
         }
+
+        public void DrawGhostTiles(Ray ray, Deployable deployableObject)
+        {
+            RaycastHit hitInfo;
+            Physics.Raycast(ray, out hitInfo, 100, 1 << 10);
+            if (hitInfo.collider)
+            {
+                Vector3 loc = hitInfo.point - _planeBottomLeftPosition;
+                var index = new IntVector2(loc.x*Columns/_boundX, loc.y*Rows/_boundY);
+
+                Vector3 dpPos = deployableObject.transform.position;
+
+                GridLinesMaterial.SetColor("_CellMaskColour", IsPlaceableWithOffset(deployableObject.TileMap, index) ? new Color(0, 1.0f, 0, 0.8f) : new Color(1.0f, 0, 0, 0.8f));
+
+                GridLinesMaterial.SetVector("_StartPosition", new Vector4(dpPos.x - deployableObject.TileMap.TileSize.X/2f, dpPos.y - deployableObject.TileMap.TileSize.Y/2f, 0, 0));
+                GridLinesMaterial.SetVector("_EndPosition", new Vector4(dpPos.x + deployableObject.TileMap.TileSize.X/2f, dpPos.y + deployableObject.TileMap.TileSize.Y/2f, 0, 0));
+            }
+        }
+
 
         public void UpdateTilesStateWithOffset(Deployable deployableObject, IntVector2 cellIndex, CellState newState)
         {

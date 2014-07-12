@@ -5,6 +5,10 @@
       _GridSpacing ("Grid Spacing", Float) = 10.0
       _GridColour ("Grid Colour", Color) = (0.5, 1.0, 1.0, 1.0)
       _BaseColour ("Base Colour", Color) = (0.0, 0.0, 0.0, 0.0)
+      _CellMaskColour ("Cell Mask Colour", Color) = (1.0, 0.0, 0.0, 0.5)
+	  _StartPosition ("Start Position Vector", Vector) = (0.0, 0.0, 0.0, 0.0)
+      _EndPosition ("End Position Vector", Vector) = (0.0, 0.0, 0.0, 0.0)
+	  _IsEnable("Is Enable", Float) = 0.0
     }
      
     SubShader {
@@ -25,6 +29,10 @@
         uniform float _GridSpacing;
         uniform float4 _GridColour;
         uniform float4 _BaseColour;
+        uniform float4 _CellMaskColour;
+        uniform vector _StartPosition;
+        uniform vector _EndPosition;
+        uniform float _IsEnable;
      
         // Input into the vertex shader
         struct vertexInput {
@@ -48,7 +56,12 @@
  
         // FRAGMENT SHADER
         float4 frag(vertexOutput input) : COLOR {
-          if (frac(input.worldPos.x/_GridSpacing) < _GridThickness || frac(input.worldPos.y/_GridSpacing) < _GridThickness) {
+		  if(_IsEnable != 0) {
+			if (input.worldPos.x  > _StartPosition.x & input.worldPos.x < _EndPosition.x & input.worldPos.y  > _StartPosition.y & input.worldPos.y < _EndPosition.y) {
+				return _CellMaskColour;
+			}
+		  } 
+		  if (frac(input.worldPos.x/_GridSpacing) < _GridThickness || frac(input.worldPos.y/_GridSpacing) < _GridThickness) {
             return _GridColour;
           }
           else {

@@ -94,11 +94,8 @@ namespace Assets.Scripts.Editor
             plane.transform.parent = grid.transform;
             grid.GridLinesTransform = plane.transform;
 
-            //This Solution is not working for unknown reason! 
             var mat = Resources.Load("Materials/GridMaterial", typeof (Material)) as Material;
             plane.renderer.material = mat;
-
-            //plane.renderer.material = grid.LineMterial;
 
             grid.GridLinesTransform.localScale = new Vector3(grid.Columns/10f, 1, grid.Rows/10f);
         }

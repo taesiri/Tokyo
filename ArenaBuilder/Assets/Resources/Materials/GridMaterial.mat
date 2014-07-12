@@ -29,6 +29,10 @@ Material:
         first:
           name: _GridSpacing
         second: 1
+      data:
+        first:
+          name: _IsEnable
+        second: 0
     m_Colors:
       data:
         first:
@@ -42,3 +46,15 @@ Material:
         first:
           name: _BaseColour
         second: {r: 1, g: 1, b: 1, a: 0}
+      data:
+        first:
+          name: _StartPosition
+        second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _EndPosition
+        second: {r: 2, g: 2, b: 0, a: 0}
+      data:
+        first:
+          name: _CellMaskColour
+        second: {r: 1, g: 0, b: 0, a: .490196079}

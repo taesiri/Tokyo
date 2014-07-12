@@ -11,17 +11,27 @@ namespace Assets.Scripts.Arena
     {
         #region BrainOrgans
 
+        private const string MapName = "SampleMap";
         [HideInInspector] public BrainStates BrainState;
         public List<Deployable> DeployableList;
         public AdvanceGrid GameGrid;
-        private bool _allowToMove;
+        private bool _allowMove;
         private Dictionary<string, Deployable> _deployableDictionary;
         private bool _gridLinesVisibilityStatus = true;
         private bool _isDown;
-        private string _mapName = "SampleMap";
         private Deployable _objectToDeploy;
         private Deployable _selectedDeployable;
         private Vector3 _selectedObjectDeltaPosition;
+
+        public bool AllowToMove
+        {
+            get { return _allowMove; }
+            set
+            {
+                _allowMove = value;
+                GameGrid.GridLinesMaterial.SetFloat("_IsEnable", value ? 1.0f : 0.0f);
+            }
+        }
 
         public bool ShowGridLines
         {
@@ -231,10 +241,9 @@ namespace Assets.Scripts.Arena
                     if (_selectedDeployable)
                         _selectedDeployable.AllowToDrawGUI = false;
 
-
                     _selectedDeployable = hitInfo.collider.gameObject.GetComponent<Deployable>();
 
-                    _allowToMove = true;
+                    AllowToMove = true;
                     GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Empty);
                     _selectedObjectDeltaPosition = _selectedDeployable.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     _selectedObjectDeltaPosition.z = 0;
@@ -242,20 +251,23 @@ namespace Assets.Scripts.Arena
                 }
                 else
                 {
-                    _allowToMove = false;
+                    AllowToMove = false;
                 }
             }
 
-            if (_allowToMove)
+            if (AllowToMove)
             {
                 Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 pos.z = _selectedDeployable.transform.position.z;
                 _selectedDeployable.transform.position = pos + _selectedObjectDeltaPosition;
+
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                GameGrid.DrawGhostTiles(ray, _selectedDeployable);
             }
 
             if (Input.GetMouseButtonUp(0))
             {
-                if (_allowToMove)
+                if (AllowToMove)
                 {
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -266,7 +278,7 @@ namespace Assets.Scripts.Arena
                 }
 
                 _isDown = false;
-                _allowToMove = false;
+                AllowToMove = false;
             }
         }
 
@@ -311,7 +323,7 @@ namespace Assets.Scripts.Arena
             Deployable[] childs = GameGrid.GetAllChildren();
 
 
-            using (XmlWriter writer = XmlWriter.Create(Application.persistentDataPath + "/" + _mapName + ".dm"))
+            using (XmlWriter writer = XmlWriter.Create(Application.persistentDataPath + "/" + MapName + ".dm"))
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("Tiles");
@@ -336,7 +348,7 @@ namespace Assets.Scripts.Arena
         public void LoadDataFromXML()
         {
             var reader = new XmlDocument();
-            reader.Load(Application.persistentDataPath + "/" + _mapName + ".dm");
+            reader.Load(Application.persistentDataPath + "/" + MapName + ".dm");
 
 
             if (reader.DocumentElement != null)

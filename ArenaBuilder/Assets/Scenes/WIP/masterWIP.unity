@@ -508,6 +508,7 @@ MonoBehaviour:
   Columns: 32
   GlobalCellWidth: 1
   Rows: 32
+  GridLinesMaterial: {fileID: 0}
   GridLinesTransform: {fileID: 858070579}
   PlaneTransform: {fileID: 1484131559}
   DrawDebugCellStatus: 0
