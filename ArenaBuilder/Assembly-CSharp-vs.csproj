@@ -65,6 +65,7 @@
      <Compile Include="Assets\Scripts\Arena\NotSoCuteCube.cs" />
      <Compile Include="Assets\Scripts\Arena\ObservableList.cs" />
      <Compile Include="Assets\Scripts\Arena\PointOnPlane.cs" />
+     <Compile Include="Assets\Scripts\Arena\SaveLoadSystem.cs" />
      <Compile Include="Assets\Scripts\Arena\TileMap.cs" />
      <Compile Include="Assets\Scripts\Helpers\GUILocationHelper.cs" />
      <Compile Include="Assets\Scripts\Helpers\IntVector2.cs" />

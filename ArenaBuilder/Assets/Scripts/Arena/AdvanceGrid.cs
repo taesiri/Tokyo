@@ -209,7 +209,7 @@ namespace Assets.Scripts.Arena
             }
         }
 
-        public bool DeployIfPossible(IntVector2 index, Deployable deployableObject)
+        public Deployable DeployIfPossible(IntVector2 index, Deployable deployableObject)
         {
             if (IsPlaceableWithOffset(deployableObject.TileMap, index, new IntVector2()))
             {
@@ -225,10 +225,10 @@ namespace Assets.Scripts.Arena
                 newCell.GridIndex = index;
 
                 UpdateTilesStateWithOffset(newCell, index, CellState.Full);
-                return true;
+                return newCell;
             }
 
-            return false;
+            return null;
         }
 
         public void EraseTiles(Ray ray)

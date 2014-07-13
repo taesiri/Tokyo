@@ -10,7 +10,6 @@ namespace Assets.Scripts.Arena
 {
     public abstract class Deployable : MonoBehaviour
     {
-        public bool AllowToDrawGUI = false;
         public DeploymentMethod DeploymentMethod;
         public IntVector2 GridIndex;
         public GUISkin MasterGUISkin;
@@ -24,7 +23,6 @@ namespace Assets.Scripts.Arena
         #region PropertyProxy
 
         public List<PropertyInfo> ListOfAllProperties;
-
         private List<GamePropertyWithName> _booleanGameProperties;
         private ObservableList<bool> _booleanPropertiesValues;
         private List<GamePropertyWithName> _floatGameProperties;
@@ -33,6 +31,12 @@ namespace Assets.Scripts.Arena
         private ObservableList<int> _integerPropertiesValues;
         private List<GamePropertyWithName> _stringGameProperties;
         private ObservableList<string> _stringPropertiesValues;
+
+        #endregion
+
+        #region GUIFields
+
+        public bool AllowToDrawGUI = false;
 
         #endregion
 
@@ -65,6 +69,8 @@ namespace Assets.Scripts.Arena
         #endregion
 
         #region PropertySystem
+
+        public bool HasChanged;
 
         public void UpdateListOfProperties()
         {
@@ -124,23 +130,26 @@ namespace Assets.Scripts.Arena
         private void _booleanPropertiesValues_Changed(int index)
         {
             _booleanGameProperties[index].GamePropertyInfo.SetValue(this, _booleanPropertiesValues[index], null);
+            HasChanged = true;
         }
 
         private void _integerPropertiesValues_Changed(int index)
         {
             _integerGameProperties[index].GamePropertyInfo.SetValue(this, _integerPropertiesValues[index], null);
+            HasChanged = true;
         }
 
         private void _floatPropertiesValues_Changed(int index)
         {
             _floatGameProperties[index].GamePropertyInfo.SetValue(this, _floatPropertiesValues[index], null);
+            HasChanged = true;
         }
 
         private void _stringPropertiesValues_Changed(int index)
         {
             _stringGameProperties[index].GamePropertyInfo.SetValue(this, _stringPropertiesValues[index], null);
+            HasChanged = true;
         }
-
 
         public List<GamePropertyWithName> GetPropertyOfType(Type t)
         {
@@ -166,6 +175,54 @@ namespace Assets.Scripts.Arena
             }
 
             return null;
+        }
+
+        public void SetProperty(Type t, string propertyName, string propertyValue)
+        {
+            UpdateListOfProperties();
+
+            if (t == typeof (bool))
+            {
+                GamePropertyWithName propertyInfo = _booleanGameProperties.FirstOrDefault(pInfo => pInfo.PropertyName == propertyName);
+
+                if (propertyInfo != null)
+                {
+                    // Not working properly!
+                    bool value;
+                    bool.TryParse(propertyValue, out value);
+                    propertyInfo.GamePropertyInfo.SetValue(this, value, null);
+                }
+            }
+            if (t == typeof (int))
+            {
+                GamePropertyWithName propertyInfo = _integerGameProperties.FirstOrDefault(pInfo => pInfo.PropertyName == propertyName);
+                if (propertyInfo != null)
+                {
+                    int value;
+                    int.TryParse(propertyValue, out value);
+                    propertyInfo.GamePropertyInfo.SetValue(this, value, null);
+                }
+            }
+            if (t == typeof (float))
+            {
+                GamePropertyWithName propertyInfo = _floatGameProperties.FirstOrDefault(pInfo => pInfo.PropertyName == propertyName);
+                if (propertyInfo != null)
+                {
+                    // NOT WORKING AT ALL!
+                    float value;
+                    float.TryParse(propertyValue, out value);
+                    propertyInfo.GamePropertyInfo.SetValue(this, value, null);
+                }
+            }
+            if (t == typeof (string))
+            {
+                GamePropertyWithName propertyInfo = _stringGameProperties.FirstOrDefault(pInfo => pInfo.PropertyName == propertyName);
+                if (propertyInfo != null)
+                {
+                    propertyInfo.GamePropertyInfo.SetValue(this, propertyValue, null);
+                }
+            }
+            HasChanged = true;
         }
 
         #endregion
@@ -227,7 +284,7 @@ namespace Assets.Scripts.Arena
                     for (int i = 0, n = _floatGameProperties.Count; i < n; i++)
                     {
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _floatGameProperties[i].PropertyName, MasterGUISkin.label);
-                        _floatPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
+                        _floatPropertiesValues[i] = Convert.ToSingle(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
                     }
                     offset += _floatGameProperties.Count;
                 }

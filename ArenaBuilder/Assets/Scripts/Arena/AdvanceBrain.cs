@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Xml;
 using Assets.Scripts.Helpers;
 using UnityEngine;
 
@@ -45,9 +43,9 @@ namespace Assets.Scripts.Arena
         #region GUIHelpers
 
         public static bool AllowOthersToDrawOnGUI = false;
+        public static Matrix4x4 GUIMatrix;
         private readonly GUILocationHelper _location = new GUILocationHelper();
         private readonly string[] _menuStrings = {"Create", "Edit", "Erase", "Move", "Play!"};
-        public static Matrix4x4 GUIMatrix;
         private int _menuSelectedIndex;
 
         #endregion
@@ -402,67 +400,12 @@ namespace Assets.Scripts.Arena
 
         public void SaveDataToXML()
         {
-            Deployable[] childs = GameGrid.GetAllChildren();
-
-
-            using (XmlWriter writer = XmlWriter.Create(Application.persistentDataPath + "/" + MapName + ".dm"))
-            {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("Tiles");
-                writer.WriteAttributeString("Row", GameGrid.Rows.ToString(CultureInfo.InvariantCulture));
-                writer.WriteAttributeString("Column", GameGrid.Columns.ToString(CultureInfo.InvariantCulture));
-
-                foreach (Deployable child in childs)
-                {
-                    writer.WriteStartElement("Tile");
-
-                    writer.WriteAttributeString("Name", child.GetDisplayName());
-                    writer.WriteAttributeString("GridIndex", child.GridIndex.ToString());
-
-                    writer.WriteEndElement();
-                }
-
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
-            }
+            GameGrid.SaveDataToXML(MapName);
         }
 
         public void LoadDataFromXML()
         {
-            var reader = new XmlDocument();
-            reader.Load(Application.persistentDataPath + "/" + MapName + ".dm");
-
-
-            if (reader.DocumentElement != null)
-            {
-                int row = Convert.ToInt32(reader.DocumentElement.Attributes["Row"].InnerText);
-                int column = Convert.ToInt32(reader.DocumentElement.Attributes["Column"].InnerText);
-
-
-                if (GameGrid.Rows == row && GameGrid.Columns == column)
-                {
-                    foreach (XmlNode node in reader.DocumentElement.ChildNodes)
-                    {
-                        if (node.Attributes != null)
-                        {
-                            var index = new IntVector2(node.Attributes["GridIndex"].InnerText);
-                            string objectName = node.Attributes["Name"].InnerText;
-
-                            GameGrid.DeployIfPossible(index, _deployableDictionary[objectName]);
-                        }
-                    }
-                }
-                else
-                {
-                    // Grid Size is Different!   
-                    //TODO : Change Grid Size
-                    UpdateGridSize();
-                }
-            }
-        }
-
-        public void UpdateGridSize()
-        {
+            GameGrid.LoadDataFromXML(MapName, _deployableDictionary);
         }
     }
 }
