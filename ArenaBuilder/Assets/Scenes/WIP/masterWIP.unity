@@ -170,7 +170,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 48349dbd31a35054d9d5f27bcd9d7a40, type: 2}
   - {fileID: 11400000, guid: 21b272949fe3ef34fbc306c789fb53eb, type: 2}
   GameGrid: {fileID: 1810626344}
-  MinPinchSpeed: 1
+  MinPinchSpeed: 2
   MovementSpeed: .0250000004
   VarianceInDistances: 1
   ZoomSpeedMouse: 5
@@ -490,7 +490,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1810626342}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.0235271, y: 9.04966164, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1484131559}

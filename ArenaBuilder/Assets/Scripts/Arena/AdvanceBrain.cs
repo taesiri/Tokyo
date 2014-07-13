@@ -55,11 +55,11 @@ namespace Assets.Scripts.Arena
         #region CameraMovementZoom
 
         public const float MaximumOrthographicSize = 40.0f;
-        public float MinPinchSpeed = 1.0F;
-        public float MovementSpeed = .01f;
+        public float MinPinchSpeed = 2.0F;
+        public float MovementSpeed = .025f;
         public float VarianceInDistances = 5.0F;
         public float ZoomSpeedMouse = 5.0f;
-        public float ZoomSpeedTocuh = 1.0f;
+        public float ZoomSpeedTocuh = 0.5f;
 
         #endregion
 
@@ -122,15 +122,15 @@ namespace Assets.Scripts.Arena
             }
 
 
-            if (GUI.Button(new Rect(10, 250, 120, 90), "SAVE"))
+            if (GUI.Button(new Rect(10, 400, 120, 90), "SAVE"))
             {
                 SaveDataToXML();
             }
-            if (GUI.Button(new Rect(10, 350, 120, 90), "LOAD"))
+            if (GUI.Button(new Rect(10, 500, 120, 90), "LOAD"))
             {
                 LoadDataFromXML();
             }
-            if (GUI.Button(new Rect(10, 450, 120, 90), "Clear"))
+            if (GUI.Button(new Rect(10, 600, 120, 90), "Clear"))
             {
                 ClearGrid();
             }
