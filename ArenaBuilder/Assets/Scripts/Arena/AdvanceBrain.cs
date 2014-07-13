@@ -47,7 +47,7 @@ namespace Assets.Scripts.Arena
         public static bool AllowOthersToDrawOnGUI = false;
         private readonly GUILocationHelper _location = new GUILocationHelper();
         private readonly string[] _menuStrings = {"Create", "Edit", "Erase", "Move", "Play!"};
-        private Matrix4x4 _guiMatrix;
+        public static Matrix4x4 GUIMatrix;
         private int _menuSelectedIndex;
 
         #endregion
@@ -65,12 +65,12 @@ namespace Assets.Scripts.Arena
 
         public void Start()
         {
-            _location.PointLocation = GUILocationHelper.Point.TopLeft;
+            _location.PointLocation = GUILocationHelper.Point.TopRight;
             _location.UpdateLocation();
 
             Vector2 ratio = _location.GuiOffset;
-            _guiMatrix = Matrix4x4.identity;
-            _guiMatrix.SetTRS(new Vector3(1, 1, 1), Quaternion.identity, new Vector3(ratio.x, ratio.y, 1));
+            GUIMatrix = Matrix4x4.identity;
+            GUIMatrix.SetTRS(new Vector3(1, 1, 1), Quaternion.identity, new Vector3(ratio.x, ratio.y, 1));
 
             _deployableDictionary = new Dictionary<string, Deployable>(DeployableList.Count);
             for (int i = 0, n = DeployableList.Count; i < n; i++)
@@ -83,6 +83,8 @@ namespace Assets.Scripts.Arena
 
         public void OnGUI()
         {
+            GUI.matrix = GUIMatrix;
+
             GUI.Label(new Rect(10, 10, 100, 50), BrainState.ToString());
             _menuSelectedIndex = GUI.Toolbar(new Rect(10, 50, 500, 75), _menuSelectedIndex, _menuStrings);
             switch (BrainState)
@@ -99,9 +101,6 @@ namespace Assets.Scripts.Arena
                     }
                     break;
                 case BrainStates.CreationMode:
-                    GUI.matrix = _guiMatrix;
-
-
                     for (int i = 0, n = DeployableList.Count; i < n; i++)
                     {
                         if (GUI.RepeatButton(new Rect(i*160, 150, 150, 50), DeployableList[i].GetDisplayName()))
@@ -116,24 +115,24 @@ namespace Assets.Scripts.Arena
                             _objectToDeploy = DeployableList[i];
                         }
                     }
-
-                    GUI.matrix = Matrix4x4.identity;
                     break;
             }
 
 
-            if (GUI.Button(new Rect(10, 400, 120, 90), "SAVE"))
+            if (GUI.Button(new Rect(_location.Offset.x - 180, 10, 150, 90), "SAVE"))
             {
                 SaveDataToXML();
             }
-            if (GUI.Button(new Rect(10, 500, 120, 90), "LOAD"))
+            if (GUI.Button(new Rect(_location.Offset.x - 180, 110, 150, 90), "LOAD"))
             {
                 LoadDataFromXML();
             }
-            if (GUI.Button(new Rect(10, 600, 120, 90), "Clear"))
+            if (GUI.Button(new Rect(_location.Offset.x - 180, 210, 150, 90), "Clear"))
             {
                 ClearGrid();
             }
+
+            GUI.matrix = Matrix4x4.identity;
             UpdateBrainState();
         }
 

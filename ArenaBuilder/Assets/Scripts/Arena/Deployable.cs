@@ -11,16 +11,15 @@ namespace Assets.Scripts.Arena
     public abstract class Deployable : MonoBehaviour
     {
         public bool AllowToDrawGUI = false;
-        public GUISkin MasterGUISkin;
         public DeploymentMethod DeploymentMethod;
         public IntVector2 GridIndex;
+        public GUISkin MasterGUISkin;
         public AdvanceGridCell ParentAdvanceGridCell;
         public GridCell ParentGridCell;
+        public IntVector2 SelctedTileIndex;
         [SerializeField] public TileMap TileMap;
         private bool _isBlack;
         private Color _selfColor = Color.yellow;
-
-        public IntVector2 SelctedTileIndex;
 
         #region PropertyProxy
 
@@ -191,13 +190,15 @@ namespace Assets.Scripts.Arena
 
         public void OnGUI()
         {
+            GUI.matrix = AdvanceBrain.GUIMatrix;
+
             if (AllowToDrawGUI && AdvanceBrain.AllowOthersToDrawOnGUI)
             {
                 if (ListOfAllProperties == null)
                     UpdateListOfProperties();
 
 
-                ScrollPosition = GUI.BeginScrollView(new Rect(25, 500, 400, 200), ScrollPosition, new Rect(0, 0, 500, 500), MasterGUISkin.horizontalScrollbar, MasterGUISkin.verticalScrollbar);
+                ScrollPosition = GUI.BeginScrollView(new Rect(25, 320, 500, 300), ScrollPosition, new Rect(0, 0, 400, 600), MasterGUISkin.horizontalScrollbar, MasterGUISkin.verticalScrollbar);
 
                 int offset = 0;
                 if (_booleanGameProperties != null)
@@ -214,8 +215,8 @@ namespace Assets.Scripts.Arena
                 {
                     for (int i = 0, n = _integerGameProperties.Count; i < n; i++)
                     {
-                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _integerGameProperties[i].PropertyName, MasterGUISkin.label);
-                        _integerPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _integerPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
+                        GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _integerGameProperties[i].PropertyName, MasterGUISkin.label);
+                        _integerPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _integerPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
                     }
                     offset += _integerGameProperties.Count;
                 }
@@ -225,8 +226,8 @@ namespace Assets.Scripts.Arena
                 {
                     for (int i = 0, n = _floatGameProperties.Count; i < n; i++)
                     {
-                        GUI.Label(new Rect(0, ((offset + i) * 45), 150, 30), _floatGameProperties[i].PropertyName, MasterGUISkin.label);
-                        _floatPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
+                        GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _floatGameProperties[i].PropertyName, MasterGUISkin.label);
+                        _floatPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
                     }
                     offset += _floatGameProperties.Count;
                 }
@@ -237,14 +238,14 @@ namespace Assets.Scripts.Arena
                     for (int i = 0, n = _stringGameProperties.Count; i < n; i++)
                     {
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _stringGameProperties[i].PropertyName, MasterGUISkin.label);
-                        _stringPropertiesValues[i] = GUI.TextField(new Rect(160, ((offset + i) * 45), 210, 30), _stringPropertiesValues[i], MasterGUISkin.textField);
+                        _stringPropertiesValues[i] = GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _stringPropertiesValues[i], MasterGUISkin.textField);
                     }
                 }
 
                 GUI.EndScrollView();
 
 
-                // TODO: Other Types of Properties
+                GUI.matrix = Matrix4x4.identity;
             }
         }
 
