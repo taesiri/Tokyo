@@ -5,6 +5,7 @@
         PlayMode,
         EditMode,
         EraserMode,
-        CreationMode
+        CreationMode,
+        NavigateMode
     }
 }

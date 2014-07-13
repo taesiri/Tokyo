@@ -109,7 +109,6 @@ namespace Assets.Scripts.Arena
 
                 if (_lastIndex != index)
                 {
-
                     IntVector2 ghostIndex = index - deltaOffset - new IntVector2(0, deployableObject.TileMap.TileSize.Y - 1) - new IntVector2(deployableObject.TileMap.TileOffset.X, -deployableObject.TileMap.TileOffset.Y);
 
                     Vector3 firstPoint = IndexToWorldPositionWithNoOffset(ghostIndex);
