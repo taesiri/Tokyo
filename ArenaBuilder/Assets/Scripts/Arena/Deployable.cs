@@ -111,6 +111,7 @@ namespace Assets.Scripts.Arena
                 {
                     _floatGameProperties.Add(new GamePropertyWithName(ListOfAllProperties[i], nameOfProperty));
                     _floatPropertiesValues.Add(Convert.ToSingle(ListOfAllProperties[i].GetValue(this, null)));
+
                 }
                 else if (ListOfAllProperties[i].PropertyType == typeof (string))
                 {
@@ -207,7 +208,6 @@ namespace Assets.Scripts.Arena
                 GamePropertyWithName propertyInfo = _floatGameProperties.FirstOrDefault(pInfo => pInfo.PropertyName == propertyName);
                 if (propertyInfo != null)
                 {
-                    // NOT WORKING AT ALL!
                     float value;
                     float.TryParse(propertyValue, out value);
                     propertyInfo.GamePropertyInfo.SetValue(this, value, null);
@@ -221,6 +221,8 @@ namespace Assets.Scripts.Arena
                     propertyInfo.GamePropertyInfo.SetValue(this, propertyValue, null);
                 }
             }
+
+            UpdateListOfProperties();
             HasChanged = true;
         }
 
@@ -299,7 +301,7 @@ namespace Assets.Scripts.Arena
                     for (int i = 0, n = _floatGameProperties.Count; i < n; i++)
                     {
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _floatGameProperties[i].PropertyName, MasterGUISkin.label);
-                        
+
                         string str = GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _floatPropertiesValues[i] == 0.0f ? "" : _floatPropertiesValues[i].ToString(), MasterGUISkin.textField);
                         float value;
 

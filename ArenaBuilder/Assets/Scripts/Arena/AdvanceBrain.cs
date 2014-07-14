@@ -192,7 +192,7 @@ namespace Assets.Scripts.Arena
                 }
             }
         }
-        
+
         private void CreationUpdate()
         {
             if (_objectToDeploy)
@@ -293,7 +293,6 @@ namespace Assets.Scripts.Arena
 
                     if (!GameGrid.DropDeployableIfPossible(ray, _selectedDeployable, _deltaIndexOffset))
                     {
-                        Debug.Log("Do Reset!");
                         ResetSelectedObjectPosition();
                     }
                 }
@@ -303,7 +302,6 @@ namespace Assets.Scripts.Arena
                 _deltaIndexOffset = null;
             }
         }
-
 
         private void EraserUpdate()
         {
@@ -321,7 +319,6 @@ namespace Assets.Scripts.Arena
                 _isDown = false;
             }
         }
-
 
         private void ResetSelectedObjectPosition()
         {
