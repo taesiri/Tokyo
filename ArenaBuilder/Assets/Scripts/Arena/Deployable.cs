@@ -273,7 +273,12 @@ namespace Assets.Scripts.Arena
                     for (int i = 0, n = _integerGameProperties.Count; i < n; i++)
                     {
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _integerGameProperties[i].PropertyName, MasterGUISkin.label);
-                        _integerPropertiesValues[i] = Convert.ToInt32(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _integerPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
+
+                        int value;
+                        if (int.TryParse(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _integerPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField), out value))
+                        {
+                            _integerPropertiesValues[i] = value;
+                        }
                     }
                     offset += _integerGameProperties.Count;
                 }
@@ -284,7 +289,12 @@ namespace Assets.Scripts.Arena
                     for (int i = 0, n = _floatGameProperties.Count; i < n; i++)
                     {
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _floatGameProperties[i].PropertyName, MasterGUISkin.label);
-                        _floatPropertiesValues[i] = Convert.ToSingle(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField));
+
+                        float value;
+                        if (float.TryParse(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField), out value))
+                        {
+                            _floatPropertiesValues[i] = value;
+                        }
                     }
                     offset += _floatGameProperties.Count;
                 }
