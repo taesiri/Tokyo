@@ -14,7 +14,6 @@
         public new void Start()
         {
             base.Start();
-            IsItActive = false;
         }
     }
 }

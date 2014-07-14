@@ -16,8 +16,6 @@ namespace Assets.Scripts.Arena
         public GridCell ParentGridCell;
         public IntVector2 SelctedTileIndex;
         [SerializeField] public TileMap TileMap;
-        private bool _isBlack;
-        private Color _selfColor = Color.yellow;
 
         #region PropertyProxy
 
@@ -44,26 +42,14 @@ namespace Assets.Scripts.Arena
         [InGameProperty(Name = "Display Name")]
         public string DisplayName { get; set; }
 
-        [InGameProperty(Name = "Is It Active")]
-        public bool IsItActive { get; set; }
+        [InGameProperty(Name = "Boolean Property")]
+        public bool MyBooleanProeprty { get; set; }
 
-        [InGameProperty(Name = "Custom Int Property")]
+        [InGameProperty(Name = "Int Property")]
         public int MyIntProperty { get; set; }
 
-        [InGameProperty(Name = "Custom Float Property")]
+        [InGameProperty(Name = "Float Property")]
         public float MyFloatProperty { get; set; }
-
-
-        [InGameProperty(Name = "Toggle Back Color")]
-        public bool GoBlack
-        {
-            get { return _isBlack; }
-            set
-            {
-                renderer.material.color = value ? Color.black : _selfColor;
-                _isBlack = value;
-            }
-        }
 
         #endregion
 
@@ -111,7 +97,6 @@ namespace Assets.Scripts.Arena
                 {
                     _floatGameProperties.Add(new GamePropertyWithName(ListOfAllProperties[i], nameOfProperty));
                     _floatPropertiesValues.Add(Convert.ToSingle(ListOfAllProperties[i].GetValue(this, null)));
-
                 }
                 else if (ListOfAllProperties[i].PropertyType == typeof (string))
                 {
@@ -230,8 +215,6 @@ namespace Assets.Scripts.Arena
 
         public void Start()
         {
-            _selfColor = renderer.material.color;
-
             if (MasterGUISkin == null)
             {
                 var gSking = Resources.Load("GUISkin/defaultGUIStyle", typeof (GUISkin)) as GUISkin;
