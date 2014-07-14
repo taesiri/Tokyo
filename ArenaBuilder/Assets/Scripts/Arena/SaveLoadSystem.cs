@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 using Assets.Scripts.Helpers;
+using UnityEngine;
 
 namespace Assets.Scripts.Arena
 {
@@ -12,7 +13,7 @@ namespace Assets.Scripts.Arena
         {
             Deployable[] tiles = gameGrid.GetAllChildren();
 
-            using (XmlWriter writer = XmlWriter.Create(@"D:\data.xml")) //Application.persistentDataPath + "/" + mapName + ".dm"
+            using (XmlWriter writer = XmlWriter.Create(Application.persistentDataPath + "/" + mapName + ".dm"))
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("Tiles");
@@ -99,8 +100,7 @@ namespace Assets.Scripts.Arena
         public static void LoadDataFromXML(this AdvanceGrid gameGrid, string mapName, Dictionary<string, Deployable> deployableDictionary)
         {
             var reader = new XmlDocument();
-            reader.Load(@"D:\data.xml");
-            //reader.Load(Application.persistentDataPath + "/" + mapName + ".dm");
+            reader.Load(Application.persistentDataPath + "/" + mapName + ".dm");
 
             if (reader.DocumentElement != null)
             {
