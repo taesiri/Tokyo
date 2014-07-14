@@ -256,27 +256,16 @@ namespace Assets.Scripts.Arena
                         _isDown = true;
                     }
                 }
-                // this code doesn't check tile status (empty or full)ness
-                // WTF
+
                 if (Input.GetMouseButtonUp(0))
                 {
                     _isDown = false;
-                    //if (_objectToDeploy && _lastVisitedTile)
-                    //{
-                    //    if (_objectToDeploy.DeploymentMethod == DeploymentMethod.Drag)
-                    //    {
-                    //        var newCell =
-                    //            (Deployable) Instantiate(_objectToDeploy, _lastVisitedTile.gameObject.transform.position,
-                    //                Quaternion.identity);
-                    //        newCell.transform.parent = GameGrid.transform;
-                    //        newCell.gameObject.layer = 9;
-                    //        newCell.ParentGridCell = _lastVisitedTile;
 
-                    //        _lastVisitedTile.InCellObject = newCell;
-                    //        _lastVisitedTile.IsEmpty = false;
-                    //    }
-                    //}
-                    //_lastVisitedTile = null;
+                    if (_objectToDeploy.DeploymentMethod == DeploymentMethod.Drag)
+                    {
+                        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                        GameGrid.DeployIfPossible(ray, _objectToDeploy);
+                    }
                 }
 
                 if (_isDown)
@@ -293,10 +282,6 @@ namespace Assets.Scripts.Arena
                 case DeploymentMethod.Brush:
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                     GameGrid.DeployIfPossible(ray, _objectToDeploy);
-                    break;
-                case DeploymentMethod.Drag:
-                    // Wait for End of Drag!
-                    //_lastVisitedTile = gCell;
                     break;
             }
         }
