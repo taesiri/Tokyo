@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Assets.Scripts.Helpers;
@@ -274,10 +273,21 @@ namespace Assets.Scripts.Arena
                     {
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _integerGameProperties[i].PropertyName, MasterGUISkin.label);
 
+
+                        string str = GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _integerPropertiesValues[i] == 0 ? "" : _integerPropertiesValues[i].ToString(), MasterGUISkin.textField);
+
                         int value;
-                        if (int.TryParse(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _integerPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField), out value))
+
+                        if (int.TryParse(str, out value))
                         {
                             _integerPropertiesValues[i] = value;
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(str))
+                            {
+                                _integerPropertiesValues[i] = 0;
+                            }
                         }
                     }
                     offset += _integerGameProperties.Count;
@@ -289,11 +299,20 @@ namespace Assets.Scripts.Arena
                     for (int i = 0, n = _floatGameProperties.Count; i < n; i++)
                     {
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _floatGameProperties[i].PropertyName, MasterGUISkin.label);
-
+                        
+                        string str = GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _floatPropertiesValues[i] == 0.0f ? "" : _floatPropertiesValues[i].ToString(), MasterGUISkin.textField);
                         float value;
-                        if (float.TryParse(GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _floatPropertiesValues[i].ToString(CultureInfo.InvariantCulture), MasterGUISkin.textField), out value))
+
+                        if (float.TryParse(str, out value))
                         {
                             _floatPropertiesValues[i] = value;
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(str))
+                            {
+                                _floatPropertiesValues[i] = 0;
+                            }
                         }
                     }
                     offset += _floatGameProperties.Count;
