@@ -19,6 +19,7 @@ namespace Assets.Scripts.Arena
         private bool _gridLinesVisibilityStatus = true;
         private bool _isDown;
         private Deployable _objectToDeploy;
+        private bool _onGui;
         private Deployable _selectedDeployable;
         private Vector3 _selectedObjectDeltaPosition;
 
@@ -28,7 +29,7 @@ namespace Assets.Scripts.Arena
             set
             {
                 _allowMove = value;
-                GameGrid.GridLinesMaterial.SetFloat("_IsEnable", value ? 1.0f : 0.0f);
+                GameGrid.IsDrawGhostTilesEnable = value;
             }
         }
 
@@ -99,23 +100,9 @@ namespace Assets.Scripts.Arena
                     }
                     break;
                 case BrainStates.CreationMode:
-                    for (int i = 0, n = DeployableList.Count; i < n; i++)
-                    {
-                        if (GUI.RepeatButton(new Rect(i*160, 150, 150, 50), DeployableList[i].GetDisplayName()))
-                        {
-                            if (DeployableList[i].DeploymentMethod == DeploymentMethod.Drag)
-                            {
-                                _isDown = true;
-                            }
-                            else if (DeployableList[i].DeploymentMethod == DeploymentMethod.Brush)
-                            {
-                            }
-                            _objectToDeploy = DeployableList[i];
-                        }
-                    }
+                    DrawDeployables();
                     break;
             }
-
 
             if (GUI.Button(new Rect(_location.Offset.x - 180, 10, 150, 90), "SAVE"))
             {
@@ -132,6 +119,37 @@ namespace Assets.Scripts.Arena
 
             GUI.matrix = Matrix4x4.identity;
             UpdateBrainState();
+        }
+
+
+        private void DrawDeployables()
+        {
+            Event e = Event.current;
+            for (int i = 0, n = DeployableList.Count; i < n; i++)
+            {
+                var buttonRect = new Rect(i*160, 150, 150, 50);
+
+                if (e.isMouse && buttonRect.Contains(e.mousePosition))
+                {
+                    if (e.type == EventType.mouseDown)
+                    {
+                        _onGui = true;
+                        _isDown = true;
+                        _objectToDeploy = DeployableList[i];
+
+                        if (_objectToDeploy.DeploymentMethod == DeploymentMethod.Drag)
+                        {
+                            GameGrid.IsDrawGhostTilesEnable = true;
+                        }
+                    }
+                    else
+                    {
+                        _onGui = false;
+                    }
+                }
+
+                GUI.Button(buttonRect, DeployableList[i].GetDisplayName());
+            }
         }
 
         private void UpdateBrainState()
@@ -164,8 +182,9 @@ namespace Assets.Scripts.Arena
 
         public void Update()
         {
-            if (GUIUtility.hotControl == 0)
+            if (!_onGui)
             {
+                Debug.Log("Updating!");
                 switch (BrainState)
                 {
                     case BrainStates.PlayMode:
@@ -257,31 +276,41 @@ namespace Assets.Scripts.Arena
                     }
                 }
 
-                if (Input.GetMouseButtonUp(0))
-                {
-                    _isDown = false;
-
-                    if (_objectToDeploy.DeploymentMethod == DeploymentMethod.Drag)
-                    {
-                        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                        GameGrid.DeployIfPossible(ray, _objectToDeploy);
-                    }
-                }
-
                 if (_isDown)
                 {
                     DragCheck();
+                }
+
+                if (Input.GetMouseButtonUp(0))
+                {
+                    if (_isDown)
+                    {
+                        if (_objectToDeploy.DeploymentMethod == DeploymentMethod.Drag)
+                        {
+                            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                            GameGrid.DeployIfPossible(ray, _objectToDeploy);
+
+                            GameGrid.IsDrawGhostTilesEnable = false;
+                        }
+
+                        _isDown = false;
+                    }
                 }
             }
         }
 
         private void DragCheck()
         {
+            Ray ray;
             switch (_objectToDeploy.DeploymentMethod)
             {
                 case DeploymentMethod.Brush:
-                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                     GameGrid.DeployIfPossible(ray, _objectToDeploy);
+                    break;
+                case DeploymentMethod.Drag:
+                    ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    GameGrid.DrawGhostTiles(ray, _objectToDeploy);
                     break;
             }
         }
@@ -342,7 +371,6 @@ namespace Assets.Scripts.Arena
 
                 _isDown = false;
                 AllowToMove = false;
-
                 _deltaIndexOffset = null;
             }
         }

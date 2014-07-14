@@ -55,5 +55,10 @@ namespace Assets.Scripts.Helpers
         {
             return new IntVector2(iv1.X - iv2.X, iv1.Y - iv2.Y);
         }
+
+        public static IntVector2 Zero()
+        {
+            return new IntVector2(0, 0);
+        }
     }
 }
