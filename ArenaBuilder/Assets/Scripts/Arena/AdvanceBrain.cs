@@ -51,17 +51,6 @@ namespace Assets.Scripts.Arena
 
         #endregion
 
-        #region CameraMovementZoom
-
-        public const float MaximumOrthographicSize = 40.0f;
-        public float MinPinchSpeed = 2.0F;
-        public float MovementSpeed = .025f;
-        public float VarianceInDistances = 5.0F;
-        public float ZoomSpeedMouse = 5.0f;
-        public float ZoomSpeedTocuh = 0.5f;
-
-        #endregion
-
         public void Start()
         {
             _location.PointLocation = GUILocationHelper.Point.TopRight;
@@ -106,15 +95,15 @@ namespace Assets.Scripts.Arena
 
             if (GUI.Button(new Rect(_location.Offset.x - 180, 10, 150, 90), "SAVE"))
             {
-                SaveDataToXML();
+                GameGrid.SaveDataToXML(MapName);
             }
             if (GUI.Button(new Rect(_location.Offset.x - 180, 110, 150, 90), "LOAD"))
             {
-                LoadDataFromXML();
+                GameGrid.LoadDataFromXML(MapName, _deployableDictionary);
             }
             if (GUI.Button(new Rect(_location.Offset.x - 180, 210, 150, 90), "Clear"))
             {
-                ClearGrid();
+                GameGrid.ClearEntireGrid();
             }
 
             GUI.matrix = Matrix4x4.identity;
@@ -199,71 +188,12 @@ namespace Assets.Scripts.Arena
                         CreationUpdate();
                         break;
                     case BrainStates.NavigateMode:
-                        NavigateUpdate();
+                        CameraMovementHandler.Handler();
                         break;
                 }
             }
         }
-
-        private void NavigateUpdate()
-        {
-            if (Input.touchCount == 2 && Input.GetTouch(0).phase == TouchPhase.Moved &&
-                Input.GetTouch(1).phase == TouchPhase.Moved)
-            {
-                Vector2 curDist = Input.GetTouch(0).position - Input.GetTouch(1).position;
-                //current distance between finger touches
-                Vector2 prevDist = ((Input.GetTouch(0).position - Input.GetTouch(0).deltaPosition) -
-                                    (Input.GetTouch(1).position - Input.GetTouch(1).deltaPosition));
-
-                float touchDelta = curDist.magnitude - prevDist.magnitude;
-
-                float speedTouch0 = Input.GetTouch(0).deltaPosition.magnitude/Input.GetTouch(0).deltaTime;
-                float speedTouch1 = Input.GetTouch(1).deltaPosition.magnitude/Input.GetTouch(1).deltaTime;
-
-
-                if ((speedTouch0 > MinPinchSpeed) && (speedTouch1 > MinPinchSpeed))
-                {
-                    if (touchDelta + VarianceInDistances <= 1)
-                    {
-                        Camera.main.orthographicSize =
-                            Mathf.Clamp(Camera.main.orthographicSize + (1*ZoomSpeedTocuh),
-                                MaximumOrthographicSize/10,
-                                MaximumOrthographicSize);
-                    }
-                    else if (touchDelta + VarianceInDistances > 1)
-                    {
-                        Camera.main.orthographicSize =
-                            Mathf.Clamp(Camera.main.orthographicSize - (1*ZoomSpeedTocuh),
-                                MaximumOrthographicSize/10, MaximumOrthographicSize);
-                    }
-                    MoveCamera(Vector3.zero);
-                }
-            }
-            else if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
-            {
-                MoveCamera(Input.GetTouch(0).deltaPosition);
-            }
-        }
-
-        public void MoveCamera(Vector3 movement)
-        {
-            //float boundaryX = (GameGrid.Columns * 6) - (Camera.main.aspect * Camera.main.orthographicSize);
-            //float boundaryY = (GameGrid.Rows * 6) - Camera.main.orthographicSize;
-
-            movement.z = 0;
-            movement *= -MovementSpeed;
-            movement *= Camera.main.orthographicSize/10;
-
-            Vector3 pos = Camera.main.transform.position;
-            pos += movement;
-
-            //pos.x = Mathf.Clamp(pos.x, -boundaryX, boundaryX);
-            //pos.y = Mathf.Clamp(pos.y, -boundaryY, boundaryY);
-
-            Camera.main.transform.position = pos;
-        }
-
-
+        
         private void CreationUpdate()
         {
             if (_objectToDeploy)
@@ -404,21 +334,6 @@ namespace Assets.Scripts.Arena
 
             _selectedDeployable.transform.position = pos;
             GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Full);
-        }
-
-        public void ClearGrid()
-        {
-            GameGrid.ClearEntireGrid();
-        }
-
-        public void SaveDataToXML()
-        {
-            GameGrid.SaveDataToXML(MapName);
-        }
-
-        public void LoadDataFromXML()
-        {
-            GameGrid.LoadDataFromXML(MapName, _deployableDictionary);
         }
     }
 }
