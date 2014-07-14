@@ -173,7 +173,6 @@ namespace Assets.Scripts.Arena
         {
             if (!_onGui)
             {
-                Debug.Log("Updating!");
                 switch (BrainState)
                 {
                     case BrainStates.PlayMode:

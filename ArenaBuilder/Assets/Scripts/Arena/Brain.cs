@@ -251,7 +251,6 @@ namespace Assets.Scripts.Arena
                     //Ignoreing Z Index
                     _selectedObjectDeltaPosition.z = 0;
 
-                    Debug.Log(_selectedObjectDeltaPosition);
                 }
                 else
                 {
