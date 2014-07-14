@@ -310,7 +310,7 @@ namespace Assets.Scripts.Arena
                     break;
                 case DeploymentMethod.Drag:
                     ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    GameGrid.DrawGhostTiles(ray, _objectToDeploy);
+                    GameGrid.DrawGhostTiles(ray, _objectToDeploy, IntVector2.Zero());
                     break;
             }
         }

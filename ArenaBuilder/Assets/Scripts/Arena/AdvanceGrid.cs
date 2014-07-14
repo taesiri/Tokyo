@@ -139,33 +139,6 @@ namespace Assets.Scripts.Arena
             }
         }
 
-
-        public void DrawGhostTiles(Ray ray, Deployable deployableObject)
-        {
-            RaycastHit hitInfo;
-            Physics.Raycast(ray, out hitInfo, 100, 1 << 10);
-            if (hitInfo.collider)
-            {
-                Vector3 loc = hitInfo.point - _planeBottomLeftPosition;
-                var index = new IntVector2(loc.x*Columns/_boundX, loc.y*Rows/_boundY);
-
-                if (_lastIndex != index)
-                {
-                    IntVector2 ghostIndex = index - new IntVector2(0, deployableObject.TileMap.TileSize.Y - 1) - new IntVector2(deployableObject.TileMap.TileOffset.X, -deployableObject.TileMap.TileOffset.Y);
-
-                    Vector3 firstPoint = IndexToWorldPositionWithNoOffset(ghostIndex);
-                    Vector3 secondPoint = firstPoint + new Vector3(deployableObject.TileMap.TileSize.X, deployableObject.TileMap.TileSize.Y, 0);
-
-                    GridLinesMaterial.SetColor("_CellMaskColour", IsPlaceableWithOffset(deployableObject.TileMap, index, IntVector2.Zero()) ? new Color(0, 1.0f, 0, 0.4f) : new Color(1.0f, 0, 0, 0.4f));
-                    GridLinesMaterial.SetVector("_StartPosition", firstPoint);
-                    GridLinesMaterial.SetVector("_EndPosition", secondPoint);
-
-                    _lastIndex = index;
-                }
-            }
-        }
-
-
         public void UpdateTilesStateWithOffset(Deployable deployableObject, IntVector2 cellIndex, CellState newState)
         {
             for (int i = 0; i < deployableObject.TileMap.TileSize.X; i++)
