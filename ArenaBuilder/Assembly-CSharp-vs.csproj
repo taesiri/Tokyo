@@ -51,7 +51,6 @@
      <Compile Include="Assets\Scripts\Arena\AdvanceGridCell.cs" />
      <Compile Include="Assets\Scripts\Arena\BigCube.cs" />
      <Compile Include="Assets\Scripts\Arena\BiggerCube.cs" />
-     <Compile Include="Assets\Scripts\Arena\Brain.cs" />
      <Compile Include="Assets\Scripts\Arena\BrainStates.cs" />
      <Compile Include="Assets\Scripts\Arena\CameraMovementHandler.cs" />
      <Compile Include="Assets\Scripts\Arena\CellState.cs" />
@@ -59,7 +58,6 @@
      <Compile Include="Assets\Scripts\Arena\Deployable.cs" />
      <Compile Include="Assets\Scripts\Arena\DeploymentMethod.cs" />
      <Compile Include="Assets\Scripts\Arena\GamePropertyWithName.cs" />
-     <Compile Include="Assets\Scripts\Arena\Grid.cs" />
      <Compile Include="Assets\Scripts\Arena\GridCell.cs" />
      <Compile Include="Assets\Scripts\Arena\IgnoreMask.cs" />
      <Compile Include="Assets\Scripts\Arena\InGameProperty.cs" />
