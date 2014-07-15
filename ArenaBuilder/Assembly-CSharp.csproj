@@ -67,6 +67,7 @@
      <Compile Include="Assets\Scripts\Arena\Tiles\WallTile.cs" />
      <Compile Include="Assets\Scripts\Helpers\GUILocationHelper.cs" />
      <Compile Include="Assets\Scripts\Helpers\IntVector2.cs" />
+     <Compile Include="Assets\Scripts\Player\BallPlayer.cs" />
      <None Include="Assets\Shaders\GridLines.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
