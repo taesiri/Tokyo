@@ -164,12 +164,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e85595d480b0dc4ca7a44aafdbfc8d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BrainState: 0
+  DefaultGUISkin: {fileID: 0}
   DeployableList:
-  - {fileID: 11400000, guid: 44d629b0ad6fdbd42bbed3301e051cad, type: 2}
-  - {fileID: 11400000, guid: 48349dbd31a35054d9d5f27bcd9d7a40, type: 2}
-  - {fileID: 11400000, guid: 21b272949fe3ef34fbc306c789fb53eb, type: 2}
-  - {fileID: 11400000, guid: 8bcc3ad657f34fd43ae6d9e9ec910f24, type: 2}
+  - {fileID: 11400000, guid: a29204d80ef2c0347a6952ec317ae562, type: 2}
+  - {fileID: 11400000, guid: e6b5ea751838da546b4c43465ff29d23, type: 2}
+  - {fileID: 11400000, guid: 41931f197ca27cf42aa7168b6e667ed4, type: 2}
+  - {fileID: 11400000, guid: 1124521c5982d694ab724a36cecec4ed, type: 2}
   GameGrid: {fileID: 1810626344}
 --- !u!4 &131154868
 Transform:

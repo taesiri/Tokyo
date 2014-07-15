@@ -222,7 +222,6 @@ namespace Assets.Scripts.Arena
             }
         }
 
-        public abstract void OnTick();
         public abstract string GetDisplayName();
 
         #region GUI
