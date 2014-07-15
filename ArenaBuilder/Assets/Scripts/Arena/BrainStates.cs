@@ -2,10 +2,10 @@
 {
     public enum BrainStates
     {
-        PlayMode,
+        CreationMode,
         EditMode,
         EraserMode,
-        CreationMode,
-        NavigateMode
+        NavigateMode,
+        PlayMode
     }
 }

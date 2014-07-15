@@ -166,7 +166,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 140226401}
   m_LocalRotation: {x: .70710665, y: 0, z: 0, w: -.707107008}
-  m_LocalPosition: {x: -16.3599701, y: .434391081, z: 2.33026185e-07}
+  m_LocalPosition: {x: -14.3354301, y: -2.02509713, z: -6.46555236e-07}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 141382975}
@@ -436,17 +436,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e85595d480b0dc4ca7a44aafdbfc8d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BrainState: 0
+  DefaultGUISkin: {fileID: 0}
   DeployableList:
   - {fileID: 11400000, guid: 44d629b0ad6fdbd42bbed3301e051cad, type: 2}
   - {fileID: 11400000, guid: 48349dbd31a35054d9d5f27bcd9d7a40, type: 2}
   - {fileID: 11400000, guid: 21b272949fe3ef34fbc306c789fb53eb, type: 2}
   GameGrid: {fileID: 1001644878}
-  MinPinchSpeed: 2
-  MovementSpeed: .0250000004
-  VarianceInDistances: 5
-  ZoomSpeedMouse: 5
-  ZoomSpeedTocuh: .5
 --- !u!1 &1975724598
 GameObject:
   m_ObjectHideFlags: 0

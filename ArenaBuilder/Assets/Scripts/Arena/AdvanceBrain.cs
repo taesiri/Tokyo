@@ -10,10 +10,11 @@ namespace Assets.Scripts.Arena
         #region BrainOrgans
 
         private const string MapName = "SampleMap";
-        [HideInInspector] public BrainStates BrainState;
+        public GUISkin DefaultGUISkin;
         public List<Deployable> DeployableList;
         public AdvanceGrid GameGrid;
         private bool _allowMove;
+        private BrainStates _brainState;
         private IntVector2 _deltaIndexOffset;
         private Dictionary<string, Deployable> _deployableDictionary;
         private bool _gridLinesVisibilityStatus = true;
@@ -39,6 +40,17 @@ namespace Assets.Scripts.Arena
             set { _gridLinesVisibilityStatus = value; }
         }
 
+
+        public BrainStates BrainState
+        {
+            get { return _brainState; }
+            set
+            {
+                _brainState = value;
+                AllowOthersToDrawOnGUI = value == BrainStates.EditMode;
+            }
+        }
+
         #endregion
 
         #region GUIHelpers
@@ -47,7 +59,7 @@ namespace Assets.Scripts.Arena
         public static Matrix4x4 GUIMatrix;
         private readonly GUILocationHelper _location = new GUILocationHelper();
         private readonly string[] _menuStrings = {"Create", "Edit", "Erase", "Move", "Play!"};
-        private int _menuSelectedIndex;
+        private bool _guiMenuToggle;
 
         #endregion
 
@@ -66,15 +78,23 @@ namespace Assets.Scripts.Arena
                 _deployableDictionary.Add(DeployableList[i].GetDisplayName(), DeployableList[i]);
             }
 
-            BrainState = BrainStates.CreationMode;
+            if (DefaultGUISkin == null)
+            {
+                DefaultGUISkin = Resources.Load("GUISkin/defaultGUIStyle", typeof (GUISkin)) as GUISkin;
+            }
         }
 
         public void OnGUI()
         {
             GUI.matrix = GUIMatrix;
 
-            GUI.Label(new Rect(10, 10, 100, 50), BrainState.ToString());
-            _menuSelectedIndex = GUI.Toolbar(new Rect(10, 50, 500, 75), _menuSelectedIndex, _menuStrings);
+            GUI.Label(new Rect(120, 10, 180, 50), BrainState.ToString(), DefaultGUISkin.label);
+
+            _guiMenuToggle = GUI.Toggle(new Rect(0, 0, 80, 80), _guiMenuToggle, "+", "Button");
+
+            if (_guiMenuToggle)
+                DrawMenu();
+
             switch (BrainState)
             {
                 case BrainStates.PlayMode:
@@ -84,12 +104,12 @@ namespace Assets.Scripts.Arena
                 case BrainStates.EditMode:
                     if (_selectedDeployable)
                     {
-                        GUI.Label(new Rect(120, 10, 400, 50),
-                            String.Format("Selected Object: {0}", _selectedDeployable.name));
+                        GUI.Label(new Rect(300, 10, 400, 50), String.Format("Selected Object: {0}", _selectedDeployable.name), DefaultGUISkin.label);
                     }
                     break;
                 case BrainStates.CreationMode:
-                    DrawDeployables();
+                    if (_guiMenuToggle)
+                        DrawDeployables();
                     break;
             }
 
@@ -107,16 +127,39 @@ namespace Assets.Scripts.Arena
             }
 
             GUI.matrix = Matrix4x4.identity;
-            UpdateBrainState();
         }
 
+
+        private void DrawMenu()
+        {
+            Event e = Event.current;
+            for (int i = 0, n = _menuStrings.Length; i < n; i++)
+            {
+                var buttonRect = new Rect(10 + i*160, 100, 150, 75);
+
+                if (e.isMouse && buttonRect.Contains(e.mousePosition))
+                {
+                    if (e.type == EventType.mouseDown)
+                    {
+                        _onGui = true;
+                        BrainState = (BrainStates) i;
+                    }
+                    else
+                    {
+                        _onGui = false;
+                    }
+                }
+
+                GUI.Button(buttonRect, _menuStrings[i]);
+            }
+        }
 
         private void DrawDeployables()
         {
             Event e = Event.current;
             for (int i = 0, n = DeployableList.Count; i < n; i++)
             {
-                var buttonRect = new Rect(i*160, 150, 150, 50);
+                var buttonRect = new Rect(15 + i*160, 210, 150, 50);
 
                 if (e.isMouse && buttonRect.Contains(e.mousePosition))
                 {
@@ -138,33 +181,6 @@ namespace Assets.Scripts.Arena
                 }
 
                 GUI.Button(buttonRect, DeployableList[i].GetDisplayName());
-            }
-        }
-
-        private void UpdateBrainState()
-        {
-            switch (_menuSelectedIndex)
-            {
-                case 0:
-                    BrainState = BrainStates.CreationMode;
-                    AllowOthersToDrawOnGUI = false;
-                    break;
-                case 1:
-                    BrainState = BrainStates.EditMode;
-                    AllowOthersToDrawOnGUI = true;
-                    break;
-                case 2:
-                    BrainState = BrainStates.EraserMode;
-                    AllowOthersToDrawOnGUI = false;
-                    break;
-                case 3:
-                    BrainState = BrainStates.NavigateMode;
-                    AllowOthersToDrawOnGUI = false;
-                    break;
-                case 4:
-                    BrainState = BrainStates.PlayMode;
-                    AllowOthersToDrawOnGUI = false;
-                    break;
             }
         }
 
