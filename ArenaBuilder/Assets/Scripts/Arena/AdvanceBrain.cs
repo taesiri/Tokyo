@@ -7,6 +7,16 @@ namespace Assets.Scripts.Arena
 {
     public class AdvanceBrain : MonoBehaviour
     {
+        #region Player
+
+        public GameObject PlayerPrefab;
+        private GameObject _currentPlayer;
+
+        private GameObject _pDest;
+        private GameObject _pStart;
+
+        #endregion
+
         #region BrainOrgans
 
         private const string MapName = "SampleMap";
@@ -48,6 +58,15 @@ namespace Assets.Scripts.Arena
             {
                 _brainState = value;
                 AllowOthersToDrawOnGUI = value == BrainStates.EditMode;
+
+                if (value == BrainStates.PlayMode)
+                {
+                    PreparePlayer();
+                }
+                else
+                {
+                    QuitPlayMode();
+                }
             }
         }
 
@@ -60,6 +79,12 @@ namespace Assets.Scripts.Arena
         private readonly GUILocationHelper _location = new GUILocationHelper();
         private readonly string[] _menuStrings = {"Create", "Edit", "Erase", "Move", "Play!"};
         private bool _guiMenuToggle;
+
+        #endregion
+
+        #region Helpers
+
+        public static AdvanceBrain Instance;
 
         #endregion
 
@@ -82,6 +107,9 @@ namespace Assets.Scripts.Arena
             {
                 DefaultGUISkin = Resources.Load("GUISkin/defaultGUIStyle", typeof (GUISkin)) as GUISkin;
             }
+
+
+            Instance = this;
         }
 
         public void OnGUI()
@@ -185,6 +213,39 @@ namespace Assets.Scripts.Arena
         }
 
 
+        private void QuitPlayMode()
+        {
+            if (_currentPlayer)
+                Destroy(_currentPlayer);
+
+
+            if (_pStart)
+                _pStart.SetActive(true);
+
+            if (_pDest)
+                _pDest.SetActive(true);
+        }
+
+        private void PreparePlayer()
+        {
+            QuitPlayMode();
+
+            _pStart = GameObject.FindWithTag("PlayerStart");
+            _pDest = GameObject.FindWithTag("PlayerDestination");
+
+
+            if (!_pStart || !_pDest)
+            {
+                Debug.LogError("Start and/or Destination not found");
+            }
+            else
+            {
+                _pStart.SetActive(false);
+                _pDest.SetActive(false);
+                _currentPlayer = (GameObject) Instantiate(PlayerPrefab,  _pStart.transform.position, Quaternion.identity);
+            }
+        }
+
         public void Update()
         {
             if (!_onGui)
@@ -192,6 +253,7 @@ namespace Assets.Scripts.Arena
                 switch (BrainState)
                 {
                     case BrainStates.PlayMode:
+
                         break;
                     case BrainStates.EraserMode:
                         EraserUpdate();

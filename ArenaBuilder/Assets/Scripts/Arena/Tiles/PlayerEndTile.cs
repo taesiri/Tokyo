@@ -4,7 +4,7 @@
     {
         public override string GetDisplayName()
         {
-            return "Player End";
+            return "Player Destination";
         }
     }
 }
