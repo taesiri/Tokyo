@@ -77,6 +77,7 @@ namespace Assets.Scripts.Arena
         public static Matrix4x4 GUIMatrix;
         private readonly GUILocationHelper _location = new GUILocationHelper();
         private readonly string[] _menuStrings = {"Create", "Edit", "Erase", "Move"};
+        private readonly string[] _otherMenuStrings = {"Save", "Load", "Clear"};
         private bool _guiMenuToggle;
         private bool _inPlayMode;
 
@@ -123,7 +124,11 @@ namespace Assets.Scripts.Arena
             ShowGridLines = GUI.Toggle(new Rect(_location.Offset.x - 100, 0, 100, 60), ShowGridLines, "#", "Button");
 
             if (_guiMenuToggle)
+            {
                 DrawMenu();
+                DrawSaveLoadButtons();
+            }
+            DrawPlayControl();
 
             switch (BrainState)
             {
@@ -138,9 +143,6 @@ namespace Assets.Scripts.Arena
                         DrawDeployables();
                     break;
             }
-
-            DrawPlayControl();
-            DrawSaveLoadButtons();
 
             GUI.matrix = Matrix4x4.identity;
         }
@@ -228,17 +230,37 @@ namespace Assets.Scripts.Arena
 
         private void DrawSaveLoadButtons()
         {
-            if (GUI.Button(new Rect(_location.Offset.x - 180, 70, 150, 90), "SAVE"))
+            Event e = Event.current;
+            for (int i = 0, n = _otherMenuStrings.Length; i < n; i++)
             {
-                GameGrid.SaveDataToXML(MapName);
-            }
-            if (GUI.Button(new Rect(_location.Offset.x - 180, 180, 150, 90), "LOAD"))
-            {
-                GameGrid.LoadDataFromXML(MapName, _deployableDictionary);
-            }
-            if (GUI.Button(new Rect(_location.Offset.x - 180, 290, 150, 90), "Clear"))
-            {
-                GameGrid.ClearEntireGrid();
+                var buttonRect = new Rect(_location.Offset.x - 180, 70 + i*90, 150, 75);
+
+                if (e.isMouse && buttonRect.Contains(e.mousePosition))
+                {
+                    if (e.type == EventType.mouseDown)
+                    {
+                        _onGui = true;
+
+                        switch (i)
+                        {
+                            case 0:
+                                GameGrid.SaveDataToXML(MapName);
+                                break;
+                            case 1:
+                                GameGrid.LoadDataFromXML(MapName, _deployableDictionary);
+                                break;
+                            case 2:
+                                GameGrid.ClearEntireGrid();
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        _onGui = false;
+                    }
+                }
+
+                GUI.Button(buttonRect, _otherMenuStrings[i]);
             }
         }
 
