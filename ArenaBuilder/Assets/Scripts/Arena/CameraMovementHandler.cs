@@ -10,13 +10,27 @@ namespace Assets.Scripts.Arena
         public static float MinPinchSpeed = 2.0F;
         public static float MovementSpeed = .025f;
         public static float VarianceInDistances = 5.0F;
-        public static float ZoomSpeedMouse = 5.0f;
+        public static float ZoomSpeedMouse = 2.0f;
         public static float ZoomSpeedTocuh = 0.5f;
+
+        #endregion
+
+        #region inEditorOnly
+
+        // TODO: Remove this block of code before production !!!
+        private static bool _isMouseButtonDown;
+        private static Vector2 _lastPosition = new Vector2(0, 0);
 
         #endregion
 
         public static void Handler()
         {
+            // TODO: Remove this block of code before production !!!
+            if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
+            {
+                HanldeInputsInEditor();
+            }
+
             if (Input.touchCount == 2 && Input.GetTouch(0).phase == TouchPhase.Moved &&
                 Input.GetTouch(1).phase == TouchPhase.Moved)
             {
@@ -72,6 +86,33 @@ namespace Assets.Scripts.Arena
             //pos.y = Mathf.Clamp(pos.y, -boundaryY, boundaryY);
 
             Camera.main.transform.position = pos;
+        }
+
+        // TODO: Remove this block of code before production !!!
+        public static void HanldeInputsInEditor()
+        {
+            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize + (-1*ZoomSpeedMouse*Input.GetAxis("Mouse ScrollWheel")), MaximumOrthographicSize/10, MaximumOrthographicSize);
+
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                _isMouseButtonDown = true;
+                _lastPosition = Input.mousePosition;
+            }
+
+
+            if (Input.GetMouseButtonUp(1))
+            {
+                _isMouseButtonDown = false;
+            }
+
+            if (_isMouseButtonDown)
+            {
+                Vector2 mPos = Input.mousePosition;
+                Vector2 delta = mPos - _lastPosition;
+                MoveCamera(delta);
+                _lastPosition = mPos;
+            }
         }
     }
 }
