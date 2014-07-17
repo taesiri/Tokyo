@@ -47,7 +47,14 @@ namespace Assets.Scripts.Arena
         public bool ShowGridLines
         {
             get { return _gridLinesVisibilityStatus; }
-            set { _gridLinesVisibilityStatus = value; }
+            set
+            {
+                if (value != _gridLinesVisibilityStatus)
+                {
+                    GameGrid.GridLinesTransform.renderer.enabled = value;
+                    _gridLinesVisibilityStatus = value;
+                }
+            }
         }
 
 
@@ -119,6 +126,7 @@ namespace Assets.Scripts.Arena
             GUI.Label(new Rect(120, 10, 180, 50), BrainState.ToString(), DefaultGUISkin.label);
 
             _guiMenuToggle = GUI.Toggle(new Rect(0, 0, 80, 80), _guiMenuToggle, "+", "Button");
+            ShowGridLines = GUI.Toggle(new Rect(_location.Offset.x - 100, 0, 45, 45), ShowGridLines, "#", "Button");
 
             if (_guiMenuToggle)
                 DrawMenu();
@@ -141,15 +149,15 @@ namespace Assets.Scripts.Arena
                     break;
             }
 
-            if (GUI.Button(new Rect(_location.Offset.x - 180, 10, 150, 90), "SAVE"))
+            if (GUI.Button(new Rect(_location.Offset.x - 180, 70, 150, 90), "SAVE"))
             {
                 GameGrid.SaveDataToXML(MapName);
             }
-            if (GUI.Button(new Rect(_location.Offset.x - 180, 110, 150, 90), "LOAD"))
+            if (GUI.Button(new Rect(_location.Offset.x - 180, 180, 150, 90), "LOAD"))
             {
                 GameGrid.LoadDataFromXML(MapName, _deployableDictionary);
             }
-            if (GUI.Button(new Rect(_location.Offset.x - 180, 210, 150, 90), "Clear"))
+            if (GUI.Button(new Rect(_location.Offset.x - 180, 290, 150, 90), "Clear"))
             {
                 GameGrid.ClearEntireGrid();
             }
@@ -212,39 +220,6 @@ namespace Assets.Scripts.Arena
             }
         }
 
-
-        private void QuitPlayMode()
-        {
-            if (_currentPlayer)
-                Destroy(_currentPlayer);
-
-
-            if (_pStart)
-                _pStart.SetActive(true);
-
-            if (_pDest)
-                _pDest.SetActive(true);
-        }
-
-        private void PreparePlayer()
-        {
-            QuitPlayMode();
-
-            _pStart = GameObject.FindWithTag("PlayerStart");
-            _pDest = GameObject.FindWithTag("PlayerDestination");
-
-
-            if (!_pStart || !_pDest)
-            {
-                Debug.LogError("Start and/or Destination not found");
-            }
-            else
-            {
-                _pStart.SetActive(false);
-                _pDest.SetActive(false);
-                _currentPlayer = (GameObject) Instantiate(PlayerPrefab,  _pStart.transform.position, Quaternion.identity);
-            }
-        }
 
         public void Update()
         {
@@ -409,5 +384,49 @@ namespace Assets.Scripts.Arena
             _selectedDeployable.transform.position = pos;
             GameGrid.UpdateTilesStateWithOffset(_selectedDeployable, _selectedDeployable.GridIndex, CellState.Full);
         }
+
+        #region PlayMode
+
+        private void QuitPlayMode()
+        {
+            if (_currentPlayer)
+                Destroy(_currentPlayer);
+
+            if (_pStart)
+                _pStart.renderer.enabled = true;
+
+            //if (_pDest)
+            //    _pDest.renderer.enabled = true;
+
+            ShowGridLines = true;
+        }
+
+        private void PreparePlayer()
+        {
+            QuitPlayMode();
+
+            _guiMenuToggle = false;
+            ShowGridLines = false;
+            _pStart = GameObject.FindWithTag("PlayerStart");
+            _pDest = GameObject.FindWithTag("PlayerDestination");
+
+            if (!_pStart || !_pDest)
+            {
+                Debug.LogWarning("Start and/or Destination not found");
+            }
+            else
+            {
+                _pStart.renderer.enabled = false;
+                //_pDest.renderer.enabled = false;
+                _currentPlayer = (GameObject) Instantiate(PlayerPrefab, _pStart.transform.position, Quaternion.identity);
+            }
+        }
+
+        public void PlayerReachedDestination()
+        {
+            QuitPlayMode();
+        }
+
+        #endregion
     }
 }

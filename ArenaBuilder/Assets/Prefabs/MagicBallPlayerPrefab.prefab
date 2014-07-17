@@ -49,7 +49,7 @@ GameObject:
   - 54: {fileID: 5400000}
   m_Layer: 0
   m_Name: MagicBallPlayerPrefab
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -192,6 +192,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   JumpHeight: 8
+  PlayerCamera: {fileID: 400002}
   Speed: 5
 --- !u!124 &12400000
 Behaviour:
