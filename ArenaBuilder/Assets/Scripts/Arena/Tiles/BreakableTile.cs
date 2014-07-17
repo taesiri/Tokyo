@@ -7,6 +7,7 @@ namespace Assets.Scripts.Arena.Tiles
         private float _health = 100f;
 
 
+        [InGameProperty(Name = "Health")]
         public float Health
         {
             get { return _health; }
@@ -17,6 +18,8 @@ namespace Assets.Scripts.Arena.Tiles
                 {
                     Destroy(gameObject);
                 }
+
+                UpdateListOfProperties();
             }
         }
 

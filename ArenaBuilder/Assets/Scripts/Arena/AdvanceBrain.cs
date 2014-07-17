@@ -66,15 +66,6 @@ namespace Assets.Scripts.Arena
             {
                 _brainState = value;
                 AllowOthersToDrawOnGUI = value == BrainStates.EditMode;
-
-                if (value == BrainStates.PlayMode)
-                {
-                    PreparePlayer();
-                }
-                else
-                {
-                    QuitPlayMode();
-                }
             }
         }
 
@@ -85,8 +76,9 @@ namespace Assets.Scripts.Arena
         public static bool AllowOthersToDrawOnGUI = false;
         public static Matrix4x4 GUIMatrix;
         private readonly GUILocationHelper _location = new GUILocationHelper();
-        private readonly string[] _menuStrings = {"Create", "Edit", "Erase", "Move", "Play!"};
+        private readonly string[] _menuStrings = {"Create", "Edit", "Erase", "Move"};
         private bool _guiMenuToggle;
+        private bool _inPlayMode;
 
         #endregion
 
@@ -125,24 +117,20 @@ namespace Assets.Scripts.Arena
         {
             GUI.matrix = GUIMatrix;
 
-            GUI.Label(new Rect(120, 10, 180, 50), BrainState.ToString(), DefaultGUISkin.label);
+            GUI.Label(new Rect(190, 10, 180, 50), BrainState.ToString(), DefaultGUISkin.label);
 
             _guiMenuToggle = GUI.Toggle(new Rect(0, 0, 80, 80), _guiMenuToggle, "+", "Button");
-            ShowGridLines = GUI.Toggle(new Rect(_location.Offset.x - 100, 0, 45, 45), ShowGridLines, "#", "Button");
+            ShowGridLines = GUI.Toggle(new Rect(_location.Offset.x - 100, 0, 100, 60), ShowGridLines, "#", "Button");
 
             if (_guiMenuToggle)
                 DrawMenu();
 
             switch (BrainState)
             {
-                case BrainStates.PlayMode:
-                    break;
-                case BrainStates.EraserMode:
-                    break;
                 case BrainStates.EditMode:
                     if (_selectedDeployable)
                     {
-                        GUI.Label(new Rect(300, 10, 400, 50), String.Format("Selected Object: {0}", _selectedDeployable.name), DefaultGUISkin.label);
+                        GUI.Label(new Rect(350, 10, 400, 50), String.Format("Selected Object: {0}", _selectedDeployable.name), DefaultGUISkin.label);
                     }
                     break;
                 case BrainStates.CreationMode:
@@ -151,18 +139,8 @@ namespace Assets.Scripts.Arena
                     break;
             }
 
-            if (GUI.Button(new Rect(_location.Offset.x - 180, 70, 150, 90), "SAVE"))
-            {
-                GameGrid.SaveDataToXML(MapName);
-            }
-            if (GUI.Button(new Rect(_location.Offset.x - 180, 180, 150, 90), "LOAD"))
-            {
-                GameGrid.LoadDataFromXML(MapName, _deployableDictionary);
-            }
-            if (GUI.Button(new Rect(_location.Offset.x - 180, 290, 150, 90), "Clear"))
-            {
-                GameGrid.ClearEntireGrid();
-            }
+            DrawPlayControl();
+            DrawSaveLoadButtons();
 
             GUI.matrix = Matrix4x4.identity;
         }
@@ -222,6 +200,47 @@ namespace Assets.Scripts.Arena
             }
         }
 
+        private void DrawPlayControl()
+        {
+            Event e = Event.current;
+            var buttonRect = new Rect(81, 0, 80, 80);
+            if (e.isMouse && buttonRect.Contains(e.mousePosition))
+            {
+                if (e.type == EventType.mouseDown)
+                {
+                    _inPlayMode = !_inPlayMode;
+                    _onGui = true;
+
+                    if (_inPlayMode)
+                    {
+                        PreparePlayer();
+                    }
+                    else
+                    {
+                        QuitPlayMode();
+                        BrainState = BrainStates.NavigateMode;
+                    }
+                }
+            }
+
+            GUI.Button(buttonRect, _inPlayMode ? "STOP" : "PLAY");
+        }
+
+        private void DrawSaveLoadButtons()
+        {
+            if (GUI.Button(new Rect(_location.Offset.x - 180, 70, 150, 90), "SAVE"))
+            {
+                GameGrid.SaveDataToXML(MapName);
+            }
+            if (GUI.Button(new Rect(_location.Offset.x - 180, 180, 150, 90), "LOAD"))
+            {
+                GameGrid.LoadDataFromXML(MapName, _deployableDictionary);
+            }
+            if (GUI.Button(new Rect(_location.Offset.x - 180, 290, 150, 90), "Clear"))
+            {
+                GameGrid.ClearEntireGrid();
+            }
+        }
 
         public void Update()
         {
@@ -229,9 +248,6 @@ namespace Assets.Scripts.Arena
             {
                 switch (BrainState)
                 {
-                    case BrainStates.PlayMode:
-
-                        break;
                     case BrainStates.EraserMode:
                         EraserUpdate();
                         break;
@@ -394,14 +410,11 @@ namespace Assets.Scripts.Arena
             if (_currentPlayer)
                 Destroy(_currentPlayer);
 
-            if (_pStart)
-                _pStart.renderer.enabled = true;
-
-            //if (_pDest)
-            //    _pDest.renderer.enabled = true;
-
-            ShowGridLines = true;
             _levelEditorCamera.gameObject.SetActive(true);
+            ShowGridLines = true;
+
+            GameGrid.ClearEntireGrid();
+            GameGrid.LoadDataFromXML(MapName, _deployableDictionary);
         }
 
         private void PreparePlayer()
@@ -409,19 +422,17 @@ namespace Assets.Scripts.Arena
             _pStart = GameObject.FindWithTag("PlayerStart");
             _pDest = GameObject.FindWithTag("PlayerDestination");
 
-
-            QuitPlayMode();
-
             if (!_pStart || !_pDest)
             {
                 Debug.LogWarning("Start and/or Destination not found");
             }
             else
             {
+                GameGrid.SaveDataToXML(MapName);
+
                 _pStart.renderer.enabled = false;
                 //_pDest.renderer.enabled = false;
                 _currentPlayer = (GameObject) Instantiate(PlayerPrefab, _pStart.transform.position, Quaternion.identity);
-
 
                 GameObject[] allMainCams = GameObject.FindGameObjectsWithTag("MainCamera");
                 if (allMainCams.Length > 1)
@@ -430,13 +441,9 @@ namespace Assets.Scripts.Arena
                     _levelEditorCamera.gameObject.SetActive(false);
                 }
 
-
-
                 _guiMenuToggle = false;
                 ShowGridLines = false;
             }
-
-
         }
 
         public void PlayerReachedDestination()
