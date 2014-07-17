@@ -29,6 +29,7 @@ namespace Assets.Scripts.Arena
         private Dictionary<string, Deployable> _deployableDictionary;
         private bool _gridLinesVisibilityStatus = true;
         private bool _isDown;
+        private Camera _levelEditorCamera;
         private Deployable _objectToDeploy;
         private bool _onGui;
         private Deployable _selectedDeployable;
@@ -117,6 +118,7 @@ namespace Assets.Scripts.Arena
 
 
             Instance = this;
+            _levelEditorCamera = Camera.main;
         }
 
         public void OnGUI()
@@ -399,11 +401,13 @@ namespace Assets.Scripts.Arena
             //    _pDest.renderer.enabled = true;
 
             ShowGridLines = true;
+            _levelEditorCamera.gameObject.SetActive(true);
         }
 
         private void PreparePlayer()
         {
             QuitPlayMode();
+
 
             _guiMenuToggle = false;
             ShowGridLines = false;
@@ -419,6 +423,14 @@ namespace Assets.Scripts.Arena
                 _pStart.renderer.enabled = false;
                 //_pDest.renderer.enabled = false;
                 _currentPlayer = (GameObject) Instantiate(PlayerPrefab, _pStart.transform.position, Quaternion.identity);
+
+
+                GameObject[] allMainCams = GameObject.FindGameObjectsWithTag("MainCamera");
+                if (allMainCams.Length > 1)
+                {
+                    // Player object has built in MainCamera component
+                    _levelEditorCamera.gameObject.SetActive(false);
+                }
             }
         }
 
