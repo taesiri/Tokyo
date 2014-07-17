@@ -238,14 +238,14 @@ namespace Assets.Scripts.Arena
                     UpdateListOfProperties();
 
 
-                ScrollPosition = GUI.BeginScrollView(new Rect(25, 320, 500, 300), ScrollPosition, new Rect(0, 0, 400, 600), MasterGUISkin.horizontalScrollbar, MasterGUISkin.verticalScrollbar);
+                ScrollPosition = GUI.BeginScrollView(new Rect(25, 550, 410, 200), ScrollPosition, new Rect(0, 0, 390, 500), MasterGUISkin.horizontalScrollbar, MasterGUISkin.verticalScrollbar);
 
                 int offset = 0;
                 if (_booleanGameProperties != null)
                 {
                     for (int i = 0, n = _booleanGameProperties.Count; i < n; i++)
                     {
-                        _booleanPropertiesValues[i] = GUI.Toggle(new Rect(0, (i*30), 400, 25), _booleanPropertiesValues[i], _booleanGameProperties[i].PropertyName, MasterGUISkin.toggle);
+                        _booleanPropertiesValues[i] = GUI.Toggle(new Rect(0, (i*30), 390, 25), _booleanPropertiesValues[i], _booleanGameProperties[i].PropertyName, MasterGUISkin.toggle);
                     }
 
                     offset += _booleanGameProperties.Count;
@@ -258,7 +258,7 @@ namespace Assets.Scripts.Arena
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _integerGameProperties[i].PropertyName, MasterGUISkin.label);
 
 
-                        string str = GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _integerPropertiesValues[i] == 0 ? "" : _integerPropertiesValues[i].ToString(), MasterGUISkin.textField);
+                        string str = GUI.TextField(new Rect(160, ((offset + i)*45), 200, 30), _integerPropertiesValues[i] == 0 ? "" : _integerPropertiesValues[i].ToString(), MasterGUISkin.textField);
 
                         int value;
 
@@ -284,7 +284,7 @@ namespace Assets.Scripts.Arena
                     {
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _floatGameProperties[i].PropertyName, MasterGUISkin.label);
 
-                        string str = GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _floatPropertiesValues[i] == 0.0f ? "" : _floatPropertiesValues[i].ToString(), MasterGUISkin.textField);
+                        string str = GUI.TextField(new Rect(160, ((offset + i)*45), 200, 30), _floatPropertiesValues[i] == 0.0f ? "" : _floatPropertiesValues[i].ToString(), MasterGUISkin.textField);
                         float value;
 
                         if (float.TryParse(str, out value))
@@ -308,7 +308,7 @@ namespace Assets.Scripts.Arena
                     for (int i = 0, n = _stringGameProperties.Count; i < n; i++)
                     {
                         GUI.Label(new Rect(0, ((offset + i)*45), 150, 30), _stringGameProperties[i].PropertyName, MasterGUISkin.label);
-                        _stringPropertiesValues[i] = GUI.TextField(new Rect(160, ((offset + i)*45), 210, 30), _stringPropertiesValues[i], MasterGUISkin.textField);
+                        _stringPropertiesValues[i] = GUI.TextField(new Rect(160, ((offset + i)*45), 200, 30), _stringPropertiesValues[i], MasterGUISkin.textField);
                     }
                 }
 

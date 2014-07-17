@@ -173,7 +173,7 @@ namespace Assets.Scripts.Arena
             Event e = Event.current;
             for (int i = 0, n = _menuStrings.Length; i < n; i++)
             {
-                var buttonRect = new Rect(10 + i*160, 100, 150, 75);
+                var buttonRect = new Rect(10, 100 + i*80, 150, 75);
 
                 if (e.isMouse && buttonRect.Contains(e.mousePosition))
                 {
@@ -197,7 +197,7 @@ namespace Assets.Scripts.Arena
             Event e = Event.current;
             for (int i = 0, n = DeployableList.Count; i < n; i++)
             {
-                var buttonRect = new Rect(15 + i*160, 210, 150, 50);
+                var buttonRect = new Rect(180, 110 + i*60, 150, 50);
 
                 if (e.isMouse && buttonRect.Contains(e.mousePosition))
                 {
@@ -406,13 +406,11 @@ namespace Assets.Scripts.Arena
 
         private void PreparePlayer()
         {
-            QuitPlayMode();
-
-
-            _guiMenuToggle = false;
-            ShowGridLines = false;
             _pStart = GameObject.FindWithTag("PlayerStart");
             _pDest = GameObject.FindWithTag("PlayerDestination");
+
+
+            QuitPlayMode();
 
             if (!_pStart || !_pDest)
             {
@@ -431,7 +429,14 @@ namespace Assets.Scripts.Arena
                     // Player object has built in MainCamera component
                     _levelEditorCamera.gameObject.SetActive(false);
                 }
+
+
+
+                _guiMenuToggle = false;
+                ShowGridLines = false;
             }
+
+
         }
 
         public void PlayerReachedDestination()
