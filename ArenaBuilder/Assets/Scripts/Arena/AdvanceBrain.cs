@@ -119,7 +119,7 @@ namespace Assets.Scripts.Arena
             GUI.matrix = GUIMatrix;
 
             GUI.Label(new Rect(190, 10, 180, 50), BrainState.ToString(), DefaultGUISkin.label);
-
+            
             _guiMenuToggle = GUI.Toggle(new Rect(0, 0, 80, 80), _guiMenuToggle, "+", "Button");
             ShowGridLines = GUI.Toggle(new Rect(_location.Offset.x - 100, 0, 100, 60), ShowGridLines, "#", "Button");
 
@@ -184,12 +184,12 @@ namespace Assets.Scripts.Arena
                     if (e.type == EventType.mouseDown)
                     {
                         _onGui = true;
-                        _isDown = true;
                         _objectToDeploy = DeployableList[i];
 
                         if (_objectToDeploy.DeploymentMethod == DeploymentMethod.Drag)
                         {
                             GameGrid.IsDrawGhostTilesEnable = true;
+                            _isDown = true;
                         }
                     }
                     else
