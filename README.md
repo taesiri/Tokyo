@@ -7,7 +7,10 @@ Tokyo is a codename for Unity's In-Game level editor.  I've done this project du
 Video
 ====
 
-< iframe title="YouTube video player" width="480" height="390" src="https://www.youtube.com/watch?v=hIPS4xZ9mCw" frameborder="0" allowfullscreen>< /iframe>
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=hIPS4xZ9mCw" target="_blank"><img src="http://img.youtube.com/vi/hIPS4xZ9mCw/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+
 
 Note
 =====
