@@ -95,7 +95,7 @@ namespace Assets.Scripts.Editor
             grid.GridLinesTransform = plane.transform;
 
             var mat = Resources.Load("Materials/GridMaterial", typeof (Material)) as Material;
-            plane.renderer.material = mat;
+            plane.GetComponent<Renderer>().material = mat;
 
             grid.GridLinesTransform.localScale = new Vector3(grid.Columns/10f, 1, grid.Rows/10f);
         }

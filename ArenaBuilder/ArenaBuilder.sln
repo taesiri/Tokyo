@@ -1,9 +1,9 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{9AAF3B88-DC56-EF5C-C16C-243A60C46FDF}") = "ArenaBuilder", "Assembly-CSharp.csproj", "{2514B060-F27D-9F18-2F49-D32BE44FC922}"
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{2514B060-F27D-9F18-2F49-D32BE44FC922}"
 EndProject
-Project("{9AAF3B88-DC56-EF5C-C16C-243A60C46FDF}") = "ArenaBuilder", "Assembly-CSharp-Editor.csproj", "{CAA7290F-28C7-B768-A7BA-CD5F5CC6485F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{CAA7290F-28C7-B768-A7BA-CD5F5CC6485F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,5 +41,4 @@ Global
 		$3.inheritsScope = text/plain
 		$3.scope = text/plain
 	EndGlobalSection
-
 EndGlobal

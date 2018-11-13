@@ -45,11 +45,11 @@ namespace Assets.Scripts.Editor
             bg.transform.position = new Vector3(0, 0, 10);
             bg.transform.Rotate(Vector3.right, 270);
             bg.name = "Background";
-            bg.renderer.material = Resources.Load("Materials/DefaultBackgroundMaterial", typeof (Material)) as Material;
+            bg.GetComponent<Renderer>().material = Resources.Load("Materials/DefaultBackgroundMaterial", typeof (Material)) as Material;
 
 
             //Camera
-            Camera.main.isOrthoGraphic = true;
+            Camera.main.orthographic = true;
             Camera.main.farClipPlane = 100;
             Camera.main.backgroundColor = Color.black;
 
@@ -62,7 +62,7 @@ namespace Assets.Scripts.Editor
             {
                 var camContainer = new GameObject("CameraContainer");
 
-                Camera.main.isOrthoGraphic = true;
+                Camera.main.orthographic = true;
                 Camera.main.orthographicSize = 5.6f;
                 Camera.main.transform.Rotate(45, 35, 0);
                 Camera.main.transform.parent = camContainer.transform;

@@ -52,7 +52,7 @@ namespace Assets.Scripts.Arena
             {
                 if (value != _gridLinesVisibilityStatus)
                 {
-                    GameGrid.GridLinesTransform.renderer.enabled = value;
+                    GameGrid.GridLinesTransform.GetComponent<Renderer>().enabled = value;
                     _gridLinesVisibilityStatus = value;
                 }
             }
@@ -157,7 +157,7 @@ namespace Assets.Scripts.Arena
 
                 if (e.isMouse && buttonRect.Contains(e.mousePosition))
                 {
-                    if (e.type == EventType.mouseDown)
+                    if (e.type == EventType.MouseDown)
                     {
                         _onGui = true;
                         BrainState = (BrainStates) i;
@@ -181,7 +181,7 @@ namespace Assets.Scripts.Arena
 
                 if (e.isMouse && buttonRect.Contains(e.mousePosition))
                 {
-                    if (e.type == EventType.mouseDown)
+                    if (e.type == EventType.MouseDown)
                     {
                         _onGui = true;
                         _objectToDeploy = DeployableList[i];
@@ -208,7 +208,7 @@ namespace Assets.Scripts.Arena
             var buttonRect = new Rect(81, 0, 80, 80);
             if (e.isMouse && buttonRect.Contains(e.mousePosition))
             {
-                if (e.type == EventType.mouseDown)
+                if (e.type == EventType.MouseDown)
                 {
                     _inPlayMode = !_inPlayMode;
                     _onGui = true;
@@ -237,7 +237,7 @@ namespace Assets.Scripts.Arena
 
                 if (e.isMouse && buttonRect.Contains(e.mousePosition))
                 {
-                    if (e.type == EventType.mouseDown)
+                    if (e.type == EventType.MouseDown)
                     {
                         _onGui = true;
 
@@ -452,7 +452,7 @@ namespace Assets.Scripts.Arena
             {
                 GameGrid.SaveDataToXML(MapName);
 
-                _pStart.renderer.enabled = false;
+                _pStart.GetComponent<Renderer>().enabled = false;
                 //_pDest.renderer.enabled = false;
                 _currentPlayer = (GameObject) Instantiate(PlayerPrefab, _pStart.transform.position, Quaternion.identity);
 

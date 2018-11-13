@@ -29,10 +29,10 @@ namespace Assets.Scripts.Player
         {
             float horizontalMovement = Input.GetAxis("Horizontal");
 
-            rigidbody.AddForce(Vector3.right*horizontalMovement*100*Speed*Time.deltaTime, ForceMode.Force);
+            GetComponent<Rigidbody>().AddForce(Vector3.right*horizontalMovement*100*Speed*Time.deltaTime, ForceMode.Force);
             if (Input.GetButtonDown("Jump"))
             {
-                rigidbody.AddForce(Vector3.up*JumpHeight, ForceMode.Impulse);
+                GetComponent<Rigidbody>().AddForce(Vector3.up*JumpHeight, ForceMode.Impulse);
             }
         }
 
@@ -60,17 +60,17 @@ namespace Assets.Scripts.Player
 
             if (GUI.RepeatButton(new Rect(_locationHelper.Offset.x - 200f, _locationHelper.Offset.y - 200f, 150, 150), ">"))
             {
-                rigidbody.AddForce(Vector3.right*20*Speed*Time.deltaTime, ForceMode.Force);
+                GetComponent<Rigidbody>().AddForce(Vector3.right*20*Speed*Time.deltaTime, ForceMode.Force);
             }
 
             if (GUI.RepeatButton(new Rect(_locationHelper.Offset.x - 400f, _locationHelper.Offset.y - 200f, 150, 150), "<"))
             {
-                rigidbody.AddForce(Vector3.left*20*Speed*Time.deltaTime, ForceMode.Force);
+                GetComponent<Rigidbody>().AddForce(Vector3.left*20*Speed*Time.deltaTime, ForceMode.Force);
             }
 
             if (GUI.Button(new Rect(10, _locationHelper.Offset.y - 200f, 150, 150), "Jump"))
             {
-                rigidbody.AddForce(Vector3.up * JumpHeight, ForceMode.Impulse);
+                GetComponent<Rigidbody>().AddForce(Vector3.up * JumpHeight, ForceMode.Impulse);
             }
             GUI.matrix = Matrix4x4.identity;
         }

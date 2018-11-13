@@ -77,15 +77,15 @@ namespace Assets.Scripts.Arena
 
             if (GridLinesTransform)
             {
-                GridLinesMaterial = GridLinesTransform.renderer.material;
+                GridLinesMaterial = GridLinesTransform.GetComponent<Renderer>().material;
             }
         }
 
         private void UpdatePlaneDetails()
         {
-            _boundX = PlaneTransform.renderer.bounds.size.x;
-            _boundY = PlaneTransform.renderer.bounds.size.y;
-            _boundZ = PlaneTransform.renderer.bounds.size.z;
+            _boundX = PlaneTransform.GetComponent<Renderer>().bounds.size.x;
+            _boundY = PlaneTransform.GetComponent<Renderer>().bounds.size.y;
+            _boundZ = PlaneTransform.GetComponent<Renderer>().bounds.size.z;
 
             _planeBottomLeftPosition = PlaneTransform.position - new Vector3(_boundX/2f, _boundY/2f, _boundZ/2f);
         }
